@@ -37,26 +37,47 @@
     "stop-words": {
       "severity": "warning",
       "exclude": [
-        "e.g.",
+        "all of",
+        "and/or",
+        "consult",
+        "cumulative",
         "currently",
-        "subsequent",
+        "demonstrate",
+        "e.g.",
+        "empower",
+        "Empower",
+        "etc",
         "failed to",
         "leverage",
+        "on request",
         "particularly",
+        "promptly",
         "proximity",
+        "redaction",
+        "relative to",
         "simply",
         "specifically",
-        "relative to",
-        "all of",
-        "demonstrate",
-        "and/or",
-        "etc",
-        "promptly",
+        "subsequent",
         "there are"
       ]
     },
     "en-capitalization": {
-      "severity": "warning"
+      "severity": "warning",
+      "allowWords": [
+        "csharp",
+        "curl",
+        "dart",
+        "elixir",
+        "go",
+        "java",
+        "liter-llm",
+        "php",
+        "python",
+        "ruby",
+        "swift",
+        "wasm",
+        "zig"
+      ]
     }
   }
 }
