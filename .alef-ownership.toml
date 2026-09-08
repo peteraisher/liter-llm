@@ -62,6 +62,7 @@ owned_paths = [
   "packages/java/pom.xml",
   "packages/kotlin-android/README.md",
   "packages/kotlin-android/gradle.properties",
+  "packages/kotlin-android/gradle/wrapper/gradle-wrapper.jar",
   "packages/kotlin-android/src/main/AndroidManifest.xml",
   "packages/node/README.md",
   "packages/python/README.md",
@@ -76,5 +77,6 @@ owned_paths = [
   "test_apps/c/Makefile",
   "test_apps/homebrew/Brewfile",
   "test_apps/java/.mvn/wrapper/maven-wrapper.properties",
+  "test_apps/kotlin_android/gradle/wrapper/gradle-wrapper.jar",
   "test_apps/node/.npmrc",
 ]
