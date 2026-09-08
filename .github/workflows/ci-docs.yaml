@@ -6,12 +6,20 @@ on:
     paths:
       - "docs-site/**"
       - "alef.toml"
+      - ".task/tools/docs.yml"
+      - ".textlintrc.json"
+      - ".textlintignore"
+      - "scripts/ci/check_prose_gate.py"
       - ".github/workflows/ci-docs.yaml"
   pull_request:
     branches: [main]
     paths:
       - "docs-site/**"
       - "alef.toml"
+      - ".task/tools/docs.yml"
+      - ".textlintrc.json"
+      - ".textlintignore"
+      - "scripts/ci/check_prose_gate.py"
       - ".github/workflows/ci-docs.yaml"
   workflow_dispatch:
 
@@ -26,6 +34,8 @@ concurrency:
 
 jobs:
   docs:
-    uses: xberg-io/actions/.github/workflows/reusable-docs-deploy.yml@v1
+    # ~keep Reviewed standalone prose support: https://github.com/xberg-io/actions/pull/63
+    uses: xberg-io/actions/.github/workflows/reusable-docs-deploy.yml@34590ef123cfe8aec4bbb0f5718996db64c70fea
     with:
+      prose-dependency-directory: docs-site
       deploy: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
