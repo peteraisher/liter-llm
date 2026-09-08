@@ -55,5 +55,8 @@
     "en-capitalization": {
       "severity": "warning"
     }
+  },
+  "plugins": {
+    "mdx": true
   }
 }
