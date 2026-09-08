@@ -25,7 +25,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -43,14 +43,14 @@ wheels = [
 
 [[package]]
 name = "liter-llm"
-version = "1.8.1"
+version = "1.19.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8e/0b/23bb2862c907391a71e8be330baa6787bb889696c53e0078fc09fcd53a2d/liter_llm-1.8.1.tar.gz", hash = "sha256:a69961e7e04b326e39ad761df39ebf33589b2cf8bc83d0c5dc6b295f104a9a32", size = 101679, upload-time = "2026-06-23T10:51:37.588Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/68/1e557b07e02b1f0a6204624e6b0c315dcb351310a392ee062d9d3c20268a/liter_llm-1.19.2.tar.gz", hash = "sha256:3c7939a848d116a77cb1d7e22bafeeede05ca1f1c5bfb200d9b291ee026106e6", size = 121317, upload-time = "2026-09-04T09:08:07.762Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/7e/69ebc513e8b84a39b7dd468c84b3d83d664e43cc82f2d77cf15c9b40815c/liter_llm-1.8.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:a4e93fd3ce36b990baa7f65f4d0a0b292700363c3b5e6e8cb9704538e6dbb8d9", size = 5694714, upload-time = "2026-06-23T10:51:28.991Z" },
-    { url = "https://files.pythonhosted.org/packages/7d/89/e3f6618e7950355e28b775db2cba5b6e797ef4cfbcabadc01c22c780ecb9/liter_llm-1.8.1-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:558ec500d4f90a92c935938716a06f4b981c5046ffa80b3e1b2d6406e28a7642", size = 7036423, upload-time = "2026-06-23T10:51:31.424Z" },
-    { url = "https://files.pythonhosted.org/packages/54/30/f488f52ed83724702440cd8bb9b9be91b724c2b0e169bac49c2a7f9832c3/liter_llm-1.8.1-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:281a82742368c857191164e7986658bd18a6a7e413fcae86002da76b5e120660", size = 7492738, upload-time = "2026-06-23T10:51:33.426Z" },
-    { url = "https://files.pythonhosted.org/packages/da/4d/a654ce451b9fcd3d039ee4e323734b530eaca75af55293224aef2fa292a6/liter_llm-1.8.1-cp310-abi3-win_amd64.whl", hash = "sha256:e0b0f22f895d9110c1f5c623914d213986809fd3a5257f301b87ab59c9884474", size = 7472939, upload-time = "2026-06-23T10:51:36.028Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/11/2d8c795dc12d10dcb39d9c3a9e3d812fb501fccbba425ac236b31e000ba4/liter_llm-1.19.2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:dca7a1102cecb4a6ee16117a04f3ce6fc7a338633bf86ad11db77d70d4ef576b", size = 6441764, upload-time = "2026-09-04T09:07:59.106Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/0d/f845d22a10b47ae276be08a3368a2ba2da74cdc5724f4249dd51d79d218d/liter_llm-1.19.2-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:312ce8700c05d2890373655dd4cfa4e740bc3b5d1126fc6bffd46de3e0764814", size = 8377268, upload-time = "2026-09-04T09:08:01.284Z" },
+    { url = "https://files.pythonhosted.org/packages/64/33/feae86a43f5754743067a42840528b8c928c9a8f7a18e0f9e608bda3927a/liter_llm-1.19.2-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:d54ad2dbdece6d5062e2ebd6a902a7d3a54b37b305a45494aaf98f0d7d8d6275", size = 8836204, upload-time = "2026-09-04T09:08:03.646Z" },
+    { url = "https://files.pythonhosted.org/packages/90/e0/a0a2171a937af4ae36acef7054f6fd3b27c741d40fb85fd180317784dfe2/liter_llm-1.19.2-cp310-abi3-win_amd64.whl", hash = "sha256:97b0101cf80c8a399159f847c5d394b756a5487d66ad7803c24c7a96fb637547", size = 8821372, upload-time = "2026-09-04T09:08:05.997Z" },
 ]
 
 [[package]]
@@ -66,7 +66,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "liter-llm", specifier = "==1.8.1" },
+    { name = "liter-llm", specifier = "==1.19.2" },
     { name = "pytest", specifier = ">=7.4" },
     { name = "pytest-asyncio", specifier = ">=0.23" },
     { name = "pytest-timeout", specifier = ">=2.1" },
