@@ -55,7 +55,7 @@ where
                 if let Some(delay) = retry::should_retry_transport_error(attempt, max_retries) {
                     attempt += 1;
                     tracing::warn!(
-                        error = %transport_error,
+                        error = %transport_error.without_url(),
                         attempt,
                         max_retries,
                         "transport-level error sending request; retrying"
@@ -431,6 +431,82 @@ mod tests {
             stream.write_all(response.as_bytes()).expect("write HTTP response");
         });
         (address, handle)
+    }
+
+    #[derive(Clone, Default)]
+    struct RetryWarnings(std::sync::Arc<std::sync::Mutex<Vec<String>>>);
+
+    impl tracing::Subscriber for RetryWarnings {
+        fn enabled(&self, metadata: &tracing::Metadata<'_>) -> bool {
+            *metadata.level() == tracing::Level::WARN
+        }
+
+        fn new_span(&self, _attributes: &tracing::span::Attributes<'_>) -> tracing::span::Id {
+            tracing::span::Id::from_u64(1)
+        }
+
+        fn record(&self, _span: &tracing::span::Id, _values: &tracing::span::Record<'_>) {}
+        fn record_follows_from(&self, _span: &tracing::span::Id, _follows: &tracing::span::Id) {}
+        fn enter(&self, _span: &tracing::span::Id) {}
+        fn exit(&self, _span: &tracing::span::Id) {}
+
+        fn event(&self, event: &tracing::Event<'_>) {
+            if event.metadata().target() != module_path!().trim_end_matches("::tests") {
+                return;
+            }
+            let mut fields = WarningFields::default();
+            event.record(&mut fields);
+            self.0.lock().expect("warning capture lock").push(fields.0);
+        }
+    }
+
+    #[derive(Default)]
+    struct WarningFields(String);
+
+    impl tracing::field::Visit for WarningFields {
+        fn record_debug(&mut self, field: &tracing::field::Field, value: &dyn std::fmt::Debug) {
+            use std::fmt::Write as _;
+            write!(&mut self.0, "{}={value:?} ", field.name()).expect("write warning fields");
+        }
+    }
+
+    #[tokio::test]
+    #[serial(outbound_policy)]
+    async fn with_retry_warning_omits_endpoint_credentials() {
+        use tracing::instrument::WithSubscriber as _;
+
+        let client = reqwest::Client::builder().no_proxy().build().expect("HTTP client");
+        let url = format!("{}path-secret-marker?key=query-secret-marker", closed_port_url());
+        let warnings = RetryWarnings::default();
+        let mut attempts = 0;
+        let result = with_retry(&url, 1, || {
+            attempts += 1;
+            client.get(&url).send()
+        })
+        .with_subscriber(warnings.clone())
+        .await;
+
+        assert!(result.is_err(), "closed port must fail after exhausting retries");
+        assert_eq!(attempts, 2, "one retry must perform two actual requests");
+        let events = warnings.0.lock().expect("warning capture lock");
+        assert_eq!(events.len(), 1, "must capture the real transport retry warning");
+        let warning = &events[0];
+        assert!(warning.contains("transport-level error sending request; retrying"));
+        assert!(
+            warning.contains("error=error sending request"),
+            "retain transport error category"
+        );
+        assert!(warning.contains("attempt=1"));
+        assert!(warning.contains("max_retries=1"));
+        assert!(
+            !warning.contains("path-secret-marker"),
+            "must not log endpoint path credentials"
+        );
+        assert!(
+            !warning.contains("query-secret-marker"),
+            "must not log endpoint query credentials"
+        );
+        assert!(!warning.contains("127.0.0.1"), "must remove the complete URL");
     }
 
     #[tokio::test]
