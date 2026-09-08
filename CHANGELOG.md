@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Refresh Python and Rust consumer locks to the current release.
+
 - Remove endpoint URLs from transport-retry warnings so URL path and query credentials
   do not reach application logs; retain retry counts and the transport error category.
 
