@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Refresh the root workspace lockfile from a current WASM build, including all six native Node packages, so frozen installation matches the release manifests.
+
 - Install prose tools from the standalone documentation workspace and check MDX as well as Markdown with real failure controls.
 
 - Refresh Python and Rust consumer locks to the current release.

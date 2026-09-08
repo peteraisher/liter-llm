@@ -13,6 +13,25 @@ importers:
       '@napi-rs/cli':
         specifier: ^3.8.6
         version: 3.8.6(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@26.4.0)(emnapi@1.11.2)(supports-color@7.2.0)
+    optionalDependencies:
+      '@xberg-io/liter-llm-darwin-arm64':
+        specifier: 1.19.2
+        version: 1.19.2
+      '@xberg-io/liter-llm-darwin-x64':
+        specifier: 1.19.2
+        version: 1.19.2
+      '@xberg-io/liter-llm-linux-arm64-gnu':
+        specifier: 1.19.2
+        version: 1.19.2
+      '@xberg-io/liter-llm-linux-x64-gnu':
+        specifier: 1.19.2
+        version: 1.19.2
+      '@xberg-io/liter-llm-win32-arm64-msvc':
+        specifier: 1.19.2
+        version: 1.19.2
+      '@xberg-io/liter-llm-win32-x64-msvc':
+        specifier: 1.19.2
+        version: 1.19.2
 
   crates/liter-llm-wasm:
     devDependencies:
@@ -39,7 +58,7 @@ importers:
     devDependencies:
       '@xberg-io/liter-llm-wasm':
         specifier: file:../../crates/liter-llm-wasm/pkg/nodejs
-        version: file:crates/liter-llm-wasm/pkg/nodejs
+        version: liter-llm-wasm@file:crates/liter-llm-wasm/pkg/nodejs
       rollup:
         specifier: ^4.63.1
         version: 4.63.1
@@ -1000,8 +1019,43 @@ packages:
   '@vitest/utils@4.1.11':
     resolution: {integrity: sha512-zTCVGpyFsGWBhllOyKlTw/vnr6D9qxsfSDyfbyZmTyjHw5N/VuvzHpHoQjm2ZJzn4RJgx5w4r7V0er69CmLgPQ==}
 
-  '@xberg-io/liter-llm-wasm@file:crates/liter-llm-wasm/pkg/nodejs':
-    resolution: {directory: crates/liter-llm-wasm/pkg/nodejs, type: directory}
+  '@xberg-io/liter-llm-darwin-arm64@1.19.2':
+    resolution: {integrity: sha512-mY6MUo643SgOHN/zDhj6HXvCCzkaHc7vvACOXM+2jQALSbPXXk7GHXf/HXt8RdEjY9wJqKl6Vh0ee6noH54QBA==}
+    engines: {node: '>= 22'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@xberg-io/liter-llm-darwin-x64@1.19.2':
+    resolution: {integrity: sha512-eyJ4e647O3ejdtj8ekIY7TX/dmwvk7yx1mVdcOtCElX0D01ZjGNQdOLF5KL8lrzzvm0zQWUgsBBNxii7SutrQQ==}
+    engines: {node: '>= 22'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@xberg-io/liter-llm-linux-arm64-gnu@1.19.2':
+    resolution: {integrity: sha512-KfEeCj/ON2axK4wHZNCzI1MBsNG/KLj+GVwxjj+tCPpS8sCBsA+kCLtTmxFWfE6JsI1umeslxpjcm9E0MBg9vg==}
+    engines: {node: '>= 22'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@xberg-io/liter-llm-linux-x64-gnu@1.19.2':
+    resolution: {integrity: sha512-MmhKsUu0N/B5JSu27yPsvWHZSoOa4GT3u6bYmuHDT4xpdwJGVNcUn/jUOUt9JHZs3XB3Hp6NNCWUjT4quPojIg==}
+    engines: {node: '>= 22'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@xberg-io/liter-llm-win32-arm64-msvc@1.19.2':
+    resolution: {integrity: sha512-OIEMphc5HNqXV+Igfhu+/5bCnwQLl/WeWz//cKHE/2tN05PmFDy7GeUP2WyOke/fO+Rr1Xx8TKUGj6oftBDTvQ==}
+    engines: {node: '>= 22'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@xberg-io/liter-llm-win32-x64-msvc@1.19.2':
+    resolution: {integrity: sha512-pTAFwTt4o/89yS80/2y5kK9hkYjBKpDdUhgLUxJUkna3D1MsG4Ps/4u2RPW4asYOLmN4KE0q/s8GoixvA2QiCQ==}
+    engines: {node: '>= 22'}
+    cpu: [x64]
+    os: [win32]
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -1132,6 +1186,9 @@ packages:
 
   json-with-bigint@3.5.12:
     resolution: {integrity: sha512-uwbF/wSSuOgC7qqlq27Xp5B6a2MHVug3t0idZdTqu0JnlFvgJuH7ju+KAk/J06C7GfhoYy2gnb9wz2INqcne7w==}
+
+  liter-llm-wasm@file:crates/liter-llm-wasm/pkg/nodejs:
+    resolution: {directory: crates/liter-llm-wasm/pkg/nodejs, type: directory}
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -2058,7 +2115,23 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  '@xberg-io/liter-llm-wasm@file:crates/liter-llm-wasm/pkg/nodejs': {}
+  '@xberg-io/liter-llm-darwin-arm64@1.19.2':
+    optional: true
+
+  '@xberg-io/liter-llm-darwin-x64@1.19.2':
+    optional: true
+
+  '@xberg-io/liter-llm-linux-arm64-gnu@1.19.2':
+    optional: true
+
+  '@xberg-io/liter-llm-linux-x64-gnu@1.19.2':
+    optional: true
+
+  '@xberg-io/liter-llm-win32-arm64-msvc@1.19.2':
+    optional: true
+
+  '@xberg-io/liter-llm-win32-x64-msvc@1.19.2':
+    optional: true
 
   argparse@2.0.1: {}
 
@@ -2181,6 +2254,8 @@ snapshots:
       argparse: 2.0.1
 
   json-with-bigint@3.5.12: {}
+
+  liter-llm-wasm@file:crates/liter-llm-wasm/pkg/nodejs: {}
 
   magic-string@0.30.21:
     dependencies:
