@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Upgrade Rust dependency requirements, including jsonschema 0.55, rmcp 3.2, and OpenDAL 0.59.1, and regenerate bindings with Alef 0.85.10.
+- Upgrade Rust dependency requirements, including jsonschema 0.55, rmcp 3.2, and OpenDAL 0.59.1, and regenerate bindings with Alef 0.85.11.
 
 ### Fixed
 
