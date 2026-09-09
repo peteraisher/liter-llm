@@ -1,6 +1,6 @@
 {
   "name": "@xberg-io/liter-llm-linux-arm64-gnu",
-  "version": "1.19.3",
+  "version": "2.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",

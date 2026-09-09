@@ -85,7 +85,7 @@ See [Rust crate](crates/liter-llm) for full documentation.
 <summary><strong>Go</strong></summary>
 
 ```sh
-go get github.com/xberg-io/liter-llm/packages/go
+go get github.com/xberg-io/liter-llm/packages/go/v2
 ```
 
 See [Go README](packages/go/README.md) for full documentation.

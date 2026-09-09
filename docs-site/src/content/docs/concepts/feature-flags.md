@@ -103,6 +103,6 @@ full → native-http, tower, tracing, otel, bedrock, tokenizer, azure-auth, vert
 
 The `tokenizers` crate (pulled in by `tokenizer`) adds roughly 10-15 MB to a release binary due to the HuggingFace tokenizer runtime. Avoid this flag in size-constrained deployments. Token counts are only required when callers need to pre-flight prompt sizes before sending to a provider.
 
-The `opendal` crate (pulled in by `opendal-cache`) varies in size depending on which storage backends are compiled in. Refer to the [OpenDAL documentation](https://opendal.apache.org) for feature-level granularity.
+The `opendal` crate (pulled in by `opendal-cache`) varies in size depending on which storage backends are compiled in. See the [OpenDAL documentation](https://opendal.apache.org) for feature-level granularity.
 
 All other flags add less than 1 MB in a typical release build.

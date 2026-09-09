@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.85.8"
+alef_version = "0.85.10"
 languages = [
   "python",
   "node",
@@ -559,7 +559,7 @@ lib_name = "liter_llm_ffi"
 extra_features = ["wasm-http"]
 
 [crates.go]
-module = "github.com/xberg-io/liter-llm/packages/go"
+module = "github.com/xberg-io/liter-llm/packages/go/v2"
 package_name = "literllm"
 
 [crates.java]
@@ -2180,7 +2180,7 @@ name = "@xberg-io/liter-llm-wasm"
 name = "liter_llm"
 
 [crates.e2e.registry.packages.go]
-module = "github.com/xberg-io/liter-llm/packages/go"
+module = "github.com/xberg-io/liter-llm/packages/go/v2"
 
 [crates.e2e.registry.packages.java]
 name = "io.xberg.literllm:liter-llm"
@@ -2207,7 +2207,7 @@ name = "liter_llm_ffi"
 name = "LiterLlm"
 
 [crates.e2e.registry.packages.zig]
-hash = "liter_llm-1.19.3-ITuy7j8Hy2Yavk0BjGZ43I0Ix2GL"
+hash = "STALE_HASH_REGENERATE"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "xberg-io/homebrew-tap"
@@ -2255,8 +2255,29 @@ replace = 'Include="XbergIo.LiterLlm" Version="{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/go/go.mod"
-search = 'github\.com/xberg-io/liter-llm/packages/go v[0-9][^\s]*'
-replace = "github.com/xberg-io/liter-llm/packages/go v{version}"
+search = 'github\.com/xberg-io/liter-llm/packages/go(?:/v2)? v[0-9][^\s]*'
+replace = "github.com/xberg-io/liter-llm/packages/go/v2 v{version}"
+
+[[workspace.sync.text_replacements]]
+path = "e2e/go/go.mod"
+search = 'github\.com/xberg-io/liter-llm/packages/go(?:/v2)? v[0-9][^\s]*'
+replace = "github.com/xberg-io/liter-llm/packages/go/v2 v{version}"
+
+[[workspace.sync.text_replacements]]
+path = "packages/go/go.mod"
+search = '(?m)^module github\.com/xberg-io/liter-llm/packages/go(?:/v2)?$'
+replace = "module github.com/xberg-io/liter-llm/packages/go/v2"
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/zig/build.zig.zon"
+search = 'https://github\.com/xberg-io/liter-llm/releases/download/v[^/]+/liter-llm-zig-v[^" ]+\.tar\.gz'
+replace = "https://github.com/xberg-io/liter-llm/releases/download/v{version}/liter-llm-zig-v{version}.tar.gz"
+
+# ~keep The published archive determines the hash; prepare:zig resolves it after publication.
+[[workspace.sync.text_replacements]]
+path = "test_apps/zig/build.zig.zon"
+search = '(?m)^\s*\.hash = "[^"\n]+",\n'
+replace = ""
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/rust/Cargo.toml"
@@ -2407,7 +2428,7 @@ tool_calling = "getting-started/tool_calling.md"
 template = "go.md"
 output_path = "packages/go/README.md"
 name = "Go"
-package_name = "github.com/xberg-io/liter-llm/packages/go"
+package_name = "github.com/xberg-io/liter-llm/packages/go/v2"
 badge_url = "https://img.shields.io/github/v/tag/xberg-io/liter-llm?label=Go&color=007ec6"
 docs_url = "https://github.com/xberg-io/liter-llm"
 description = "Universal LLM API client for Go. Access 165 LLM providers through a single interface with idiomatic Go API, context-aware async support, and CGO-based native performance."

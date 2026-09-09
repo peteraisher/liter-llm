@@ -255,7 +255,7 @@ tasks:
       # spawns a doomed toolchain per snippet and cannot pass by construction. Discovery, the
       # reference-page audit and gap detection still run. Use `task alef:snippets` after
       # `alef build` when you actually want validation.
-      - alef all --clean --skip-snippet-validation
+      - alef all --clean --skip-compile --skip-snippet-validation
 
   alef:all:
     desc: Run full alef pipeline (extract + generate + stubs + scaffold + readme + docs + e2e)

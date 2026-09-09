@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.19.3] - 2026-09-09
+## [2.0.0] - 2026-09-09
+
+### Breaking changes
+
+- Rust callers of `OpenDalCacheStore::new` and `OpenDalVectorStore::new` must pass an `opendal` 0.59 operator instead of 0.58. Upgrade the application dependency alongside Liter.
+- Go consumers must use `github.com/xberg-io/liter-llm/packages/go/v2` in imports and module requirements.
 
 ### Changed
 
-- Upgrade Rust dependency requirements, including jsonschema 0.55, rmcp 3.2, and OpenDAL 0.59.1, and regenerate bindings with Alef 0.85.8.
+- Upgrade Rust dependency requirements, including jsonschema 0.55, rmcp 3.2, and OpenDAL 0.59.1, and regenerate bindings with Alef 0.85.10.
 
 ### Fixed
 
+- Resolve the current Zig release archive and its actual content hash before running published consumer tests.
 - Render Cargo installation commands in the Rust package README.
 
 - Keep task lint coverage compatible with current Poly reports while rejecting formatter errors.

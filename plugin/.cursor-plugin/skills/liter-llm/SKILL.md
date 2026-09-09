@@ -17,8 +17,8 @@ metadata:
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:a9ebf7409cdd2e0aa6c1374b018a5d8066efbecbb8a501f9e901e288221e6e3e
-Source-Hash: blake3:ef8a19d61ba8bc40bbfb57d61ceb80dac33b3f1732dc3ecf6c3ebe6815311e58
+Content-Hash: blake3:a098a59ef2959979e54ded16cddc10c778b5de657670a0830b0311a726c4ee61
+Source-Hash: blake3:3ed609d1c9d64e8d150fe104c20f5c92b0cd34ec9ca66743bab3e7042a954748
 Schema-Version: v1
 -->
 
@@ -90,7 +90,7 @@ docker pull ghcr.io/xberg-io/liter-llm
 | Python | `pip install liter-llm` |
 | Node.js | `pnpm add @xberg-io/liter-llm` |
 | Rust | `cargo add liter-llm` |
-| Go | `go get github.com/xberg-io/liter-llm/packages/go` |
+| Go | `go get github.com/xberg-io/liter-llm/packages/go/v2` |
 | Ruby | `gem install liter_llm` |
 | PHP | `composer require xberg-io/liter-llm` |
 | C# | `dotnet add package XbergIo.LiterLlm` |

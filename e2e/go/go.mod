@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	github.com/stretchr/testify v1.11.1
-	github.com/xberg-io/liter-llm/packages/go v1.16.0
+	github.com/xberg-io/liter-llm/packages/go/v2 v2.0.0
 )
 
 require (
@@ -13,4 +13,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/xberg-io/liter-llm/packages/go => ../../packages/go
+replace github.com/xberg-io/liter-llm/packages/go/v2 => ../../packages/go

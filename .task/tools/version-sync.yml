@@ -20,7 +20,7 @@ tasks:
       # `alef docs` is deliberately NOT here. It aborts on doc-snippet typechecking, and when
       # it aborts it has already written the reference pages WITHOUT their `alef:hash:` lines,
       # which flips `alef verify` from pass to fail. Run it separately and deliberately.
-      - "{{.ALEF}} generate"
+      - "{{.ALEF}} generate --skip-compile"
       - "{{.ALEF}} stubs"
       - "{{.ALEF}} scaffold"
       - "{{.ALEF}} readme"
