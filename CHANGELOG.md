@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Serve actually compressed gzip bodies for mock HTTP fixtures that declare gzip encoding.
+- Propagate C# native failures from fallible void calls and preserve numeric error codes in typed exceptions.
+- Narrow Java boolean native return values before comparison while retaining the compatible wide call layout.
 - Resolve the current Zig release archive and its actual content hash before running published consumer tests.
 - Render Cargo installation commands in the Rust package README.
 
