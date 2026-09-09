@@ -9,44 +9,7 @@ no-default-features = false
 feature-depth = 1
 
 [advisories]
-ignore = [
-  "RUSTSEC-2025-0119",
-  "RUSTSEC-2024-0436",
-  "RUSTSEC-2023-0071",
-  "RUSTSEC-2026-0194",
-  "RUSTSEC-2026-0195",
-  # h2 0.3.27: accepts and queues unbounded empty DATA frames, so an undrained
-  # stream can grow memory without limit or panic. Low severity. Transitive via
-  # aws-config/aws-sdk-secretsmanager/aws-sdk-sts -> aws-smithy-http-client 1.4.0
-  # -> hyper 0.14.32 -> h2 0.3.x, i.e. the AWS SDK CLIENT talking to AWS
-  # endpoints. liter-llm-proxy SERVES on hyper 1.11.1 / h2 0.4.19, which is
-  # unaffected, so no untrusted peer reaches the vulnerable code. There is no
-  # patched 0.3.x -- 0.3.27 is the newest of that line -- and
-  # aws-smithy-http-client 1.4.0 is already the latest release, so `cargo update`
-  # cannot clear it. Blocked on an upstream AWS SDK release that moves off
-  # hyper 0.14. ~keep
-  "RUSTSEC-2026-0258",
-  # rustls-webpki 0.101.7: reachable panic in CRL parsing. Transitive via
-  # aws-config/aws-sdk-secretsmanager -> aws-smithy-http-client 1.2.0 ->
-  # hyper-rustls 0.24.2 -> rustls 0.21.12; only present with the `full` or
-  # `secrets-aws` feature. aws-smithy-http-client is already at its latest
-  # semver-compatible version, so `cargo update` cannot clear it. Blocked on
-  # an upstream AWS SDK release that moves off rustls 0.21. ~keep
-  "RUSTSEC-2026-0104",
-  # rustls-webpki 0.101.7: name-constraint bypass for URI names. Same
-  # transitive AWS SDK chain and blocker as RUSTSEC-2026-0104. ~keep
-  "RUSTSEC-2026-0098",
-  # rustls-webpki 0.101.7: name-constraint bypass for wildcard certs. Same
-  # transitive AWS SDK chain and blocker as RUSTSEC-2026-0104. ~keep
-  "RUSTSEC-2026-0099",
-  # rkyv 0.7.46: out-of-bounds read. Optional dependency of rust_decimal that
-  # no enabled feature activates (`cargo tree` finds zero occurrences) — it
-  # is never compiled in, but stays in Cargo.lock as a resolver artifact, so
-  # cargo-deny/cargo-audit flag it from the lockfile regardless. Removable
-  # once rust_decimal drops the lock entry or a lockfile-only exclusion is
-  # available. ~keep
-  "RUSTSEC-2026-0235",
-]
+ignore = ["RUSTSEC-2025-0119", "RUSTSEC-2024-0436", "RUSTSEC-2023-0071", "RUSTSEC-2026-0194", "RUSTSEC-2026-0195"]
 
 [licenses]
 allow = [

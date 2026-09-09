@@ -2,7 +2,7 @@
 id: readme_rust_basic_chat
 language: rust
 target: rust
-level: syntax
+level: typecheck
 requires: []
 side_effect: network
 ---

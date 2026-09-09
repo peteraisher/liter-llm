@@ -140,9 +140,10 @@ pub use cost::{CostTrackingLayer, CostTrackingService};
 pub use fallback::{FallbackLayer, FallbackService};
 pub use fallback_chain::{DefaultRetryPolicy, FallbackChainLayer, FallbackChainService, RetryClass, RetryPolicy};
 pub use guardrail::{GuardrailLayer, GuardrailService, TENANT_ID_METADATA_KEY};
+#[cfg(feature = "native-http")]
+pub use health::HttpProbeHealthChecker;
 pub use health::{
-    HealthCheckConfig, HealthCheckLayer, HealthCheckService, HealthChecker, HealthStatus, HttpProbeHealthChecker,
-    PerProviderHealthCheck,
+    HealthCheckConfig, HealthCheckLayer, HealthCheckService, HealthChecker, HealthStatus, PerProviderHealthCheck,
 };
 pub use hedge::{BudgetAwareHedge, FixedDelayHedge, HedgeLayer, HedgePolicy, HedgeService};
 pub use hooks::{HooksLayer, HooksService, LlmHook};

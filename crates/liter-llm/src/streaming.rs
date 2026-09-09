@@ -626,23 +626,21 @@ mod tests {
         }
     }
 
-    /// Stream of `Result<Bytes, reqwest::Error>` from a Vec of strings.
+    /// Stream of `Result<Bytes, LiterLlmError>` from a Vec of strings.
     ///
     /// Uses `futures_util::stream::iter` (synchronous) so the stream is `Unpin`
     /// and can be used directly with `.next().await` without boxing.
-    fn sse_byte_stream(lines: Vec<String>) -> impl Stream<Item = std::result::Result<Bytes, reqwest::Error>> + Unpin {
+    fn sse_byte_stream(lines: Vec<String>) -> impl Stream<Item = std::result::Result<Bytes, LiterLlmError>> + Unpin {
         let joined = lines.join("");
-        futures_util::stream::iter(vec![Ok::<_, reqwest::Error>(Bytes::from(joined))])
+        futures_util::stream::iter(vec![Ok::<_, LiterLlmError>(Bytes::from(joined))])
     }
 
     /// Stream that yields each `parts` entry as a *separate* `Bytes` item, so a
     /// caller can reproduce a multi-byte codepoint split across chunk boundaries.
-    fn split_byte_stream(
-        parts: Vec<Vec<u8>>,
-    ) -> impl Stream<Item = std::result::Result<Bytes, reqwest::Error>> + Unpin {
+    fn split_byte_stream(parts: Vec<Vec<u8>>) -> impl Stream<Item = std::result::Result<Bytes, LiterLlmError>> + Unpin {
         let items: Vec<_> = parts
             .into_iter()
-            .map(|p| Ok::<_, reqwest::Error>(Bytes::from(p)))
+            .map(|p| Ok::<_, LiterLlmError>(Bytes::from(p)))
             .collect();
         futures_util::stream::iter(items)
     }

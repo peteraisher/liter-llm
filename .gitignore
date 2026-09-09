@@ -1,4 +1,5 @@
 # Build output
+/e2e/c/ffi/
 target/
 build/
 dist/

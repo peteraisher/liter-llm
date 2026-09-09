@@ -2321,7 +2321,6 @@
     "typescript/files/edge-file-empty-list.md",
     "typescript/files/edge-file-large-upload.md",
     "typescript/files/error-file-auth-401.md",
-    "typescript/files/error-file-bad-purpose.md",
     "typescript/files/error-file-not-found.md",
     "typescript/files/smoke-create-file.md",
     "typescript/files/smoke-delete-file.md",
@@ -2509,7 +2508,6 @@
     "wasm/files/edge-file-empty-list.md",
     "wasm/files/edge-file-large-upload.md",
     "wasm/files/error-file-auth-401.md",
-    "wasm/files/error-file-bad-purpose.md",
     "wasm/files/error-file-not-found.md",
     "wasm/files/smoke-create-file.md",
     "wasm/files/smoke-delete-file.md",
@@ -31220,18 +31218,6 @@
     },
     {
       "key": {
-        "fixture_id": "error_file_bad_purpose",
-        "language": "node"
-      },
-      "path": "typescript/files/error-file-bad-purpose.md",
-      "language": "typescript",
-      "target": "node",
-      "session": "node",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
         "fixture_id": "error_file_not_found",
         "language": "node"
       },
@@ -33468,18 +33454,6 @@
         "language": "wasm"
       },
       "path": "wasm/files/error-file-auth-401.md",
-      "language": "typescript",
-      "target": "wasm",
-      "session": "wasm",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "error_file_bad_purpose",
-        "language": "wasm"
-      },
-      "path": "wasm/files/error-file-bad-purpose.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -52612,10 +52586,6 @@
     },
     {
       "fixture_id": "error_file_bad_purpose",
-      "language": "node"
-    },
-    {
-      "fixture_id": "error_file_bad_purpose",
       "language": "php"
     },
     {
@@ -52633,10 +52603,6 @@
     {
       "fixture_id": "error_file_bad_purpose",
       "language": "swift"
-    },
-    {
-      "fixture_id": "error_file_bad_purpose",
-      "language": "wasm"
     },
     {
       "fixture_id": "error_file_bad_purpose",
@@ -59784,5 +59750,22 @@
     }
   ],
   "missing": [],
-  "documented_exceptions": []
+  "documented_exceptions": [
+    {
+      "key": {
+        "fixture_id": "error_file_bad_purpose",
+        "language": "node"
+      },
+      "reason": "FilePurpose is a closed enum: the native constructor rejects invalid-purpose before HTTP, so a type-correct snippet cannot demonstrate this HTTP 400 response.",
+      "reference": "crates/liter-llm-node/index.d.ts"
+    },
+    {
+      "key": {
+        "fixture_id": "error_file_bad_purpose",
+        "language": "wasm"
+      },
+      "reason": "WasmFilePurpose contains only declared members; InvalidPurpose does not exist. Accessing that absent JavaScript member yields undefined and coerces to Assistants, so it cannot demonstrate an invalid-purpose HTTP request.",
+      "reference": "crates/liter-llm-wasm/src/lib.rs"
+    }
+  ]
 }

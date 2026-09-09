@@ -38,7 +38,7 @@ otel = ["dep:tracing-opentelemetry", "dep:opentelemetry"]
 
 tower = ["dep:tower", "dep:tower-http", "dep:futures-util", "dep:rand"]
 
-opendal-cache = ["dep:opendal", "tower"]
+opendal-cache = ["dep:opendal", "dep:opendal-http-transport-reqwest", "dep:rustls", "tower"]
 
 guardrail-cel = ["dep:cel-interpreter"]
 
@@ -138,12 +138,14 @@ web-time = { version = "1", optional = true }
 # ~keep Non-Windows uses rustls + ring to avoid aws-lc-sys as the bundled TLS provider.
 # ~keep The workspace reqwest base is TLS-agnostic; this layer supplies TLS.
 [target.'cfg(not(target_os = "windows"))'.dependencies]
+opendal-http-transport-reqwest = { workspace = true, optional = true, features = ["rustls-no-provider"] }
 reqwest = { workspace = true, optional = true, features = ["rustls-no-provider"] }
 rustls = { workspace = true, optional = true }
 
 # ~keep Windows uses SChannel via native-tls to avoid aws-lc-sys MSVC build failures.
 # ~keep rustls is intentionally not pulled in on Windows.
 [target.'cfg(target_os = "windows")'.dependencies]
+opendal-http-transport-reqwest = { workspace = true, optional = true, features = ["native-tls"] }
 reqwest = { workspace = true, optional = true, features = ["native-tls"] }
 
 [dev-dependencies]
@@ -153,6 +155,7 @@ futures-util = { workspace = true }
 jsonschema = { workspace = true }
 serde_json = { workspace = true }
 serial_test = { workspace = true }
+tempfile = { workspace = true }
 tokio = { workspace = true, features = ["test-util", "macros"] }
 # Needed only by tower::tracing tests: the span contract is asserted through a hand-rolled
 # Subscriber, whose current_span() must return tracing_core::span::Current — a type `tracing`

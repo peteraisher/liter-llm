@@ -7,7 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.3] - 2026-09-09
+
+### Changed
+
+- Upgrade Rust dependency requirements, including jsonschema 0.55, rmcp 3.2, and OpenDAL 0.59.1, and regenerate bindings with Alef 0.85.8.
+
 ### Fixed
+
+- Keep task lint coverage compatible with current Poly reports while rejecting formatter errors.
+- Update Ruby E2E Faraday and JSON dependencies to resolve three security advisories.
+- Synchronize Java and Kotlin test harnesses with the patched Jackson dependencies used by generated packages. Verify both Kotlin registry pins against the release version before native tests.
+- Update vulnerable JavaScript tooling and documentation dependencies, preserving scoped security overrides across regeneration.
+- Include every generated Zig streaming test in the native test build and check source-to-target coverage before running it.
+- Align PHP enum conversions with enabled core features and require the expected native exception in Ruby streaming error tests.
+
+- Build Swift native artifacts for the advertised macOS 13 and iOS 16 minimum versions.
+
+- Remove five Rust advisories by selecting the modern AWS Secrets Manager transport with Tokio runtime support and updating rust_decimal.
+
+- Preserve complete Python streaming requests and Ruby renamed and internally tagged fields.
+- Accept both native Elixir client references and typed wrappers in top-level client methods.
+- Make generated PHP error tests assert actual exceptions and Kotlin content tests check nonempty text.
+- Correct Swift stream and content assertions, and make generated streaming examples inspect individual chunks and release native resources.
+- Preserve Alef-owned Node declarations and loaders during native builds.
+- Remove obsolete standalone Swift bridge headers so the generated umbrella module passes strict compiler checks.
+- Resolve Java example dependencies from the Maven manifest and distinguish mocked fixture URLs from hosted samples.
+- Generate numeric C handles for file and batch list calls.
+
+- Correct the C# client factory and Java exception handling in documentation examples, and type-check them.
+
+- Synchronize the C# consumer using its actual `XbergIo.LiterLlm` NuGet package reference.
+- Restore Kotlin Android publishing after verifying the regenerated AAR and JNI bridge.
 
 - Refresh the root workspace lockfile from a current WASM build, including all six native Node packages, so frozen installation matches the release manifests.
 

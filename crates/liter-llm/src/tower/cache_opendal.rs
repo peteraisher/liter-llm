@@ -102,6 +102,9 @@ impl OpenDalCacheStore {
         prefix: impl Into<String>,
         ttl: Duration,
     ) -> crate::error::Result<Self> {
+        crate::ensure_crypto_provider();
+        opendal::init_default_registry();
+        opendal_http_transport_reqwest::install_default();
         let operator = Operator::via_iter(scheme, config).map_err(|e| crate::error::LiterLlmError::InternalError {
             message: format!("failed to build OpenDAL operator for '{scheme}': {e}"),
         })?;
@@ -395,6 +398,151 @@ mod tests {
             Some(CachedResponse::Chat(resp)) => assert_eq!(resp.id, "test-resp-002"),
             _ => panic!("expected updated CachedResponse::Chat variant"),
         }
+    }
+
+    #[tokio::test]
+    async fn from_config_filesystem_persists_exact_cached_response() {
+        let directory = tempfile::tempdir().expect("create isolated filesystem cache");
+        let config = HashMap::from([(
+            "root".to_owned(),
+            directory.path().to_str().expect("temporary path is UTF-8").to_owned(),
+        )]);
+        let store = OpenDalCacheStore::from_config("fs", config, "responses/", Duration::from_secs(300))
+            .expect("configured filesystem service must be available without caller registration");
+        let expected = dummy_response();
+        let expected_json = serde_json::to_value(&expected).expect("serialize expected cached response");
+
+        store.put(42, "filesystem-request".to_owned(), expected).await;
+
+        let bytes = tokio::fs::read(directory.path().join("responses/42"))
+            .await
+            .expect("put must persist an actual filesystem entry");
+        let persisted: StoredEntry = serde_json::from_slice(&bytes).expect("decode persisted cache entry");
+        assert_eq!(persisted.request_body, "filesystem-request");
+        assert_eq!(persisted.ttl_secs, 300);
+        assert_eq!(
+            serde_json::to_value(persisted.response).expect("serialize persisted response"),
+            expected_json
+        );
+        let actual = store
+            .get(42, "filesystem-request")
+            .await
+            .expect("read cached filesystem response");
+        assert_eq!(
+            serde_json::to_value(actual).expect("serialize cached response"),
+            expected_json
+        );
+
+        store.remove(42).await;
+        assert_eq!(
+            tokio::fs::metadata(directory.path().join("responses/42"))
+                .await
+                .expect_err("remove must delete the persisted entry")
+                .kind(),
+            std::io::ErrorKind::NotFound,
+        );
+    }
+
+    async fn receive_http_request(stream: &mut tokio::net::TcpStream) -> (String, Vec<u8>) {
+        use tokio::io::AsyncReadExt;
+        const MAX_FIXTURE_REQUEST_BYTES: usize = 65_536;
+        let mut bytes = Vec::new();
+        let header_end = loop {
+            assert!(bytes.len() < MAX_FIXTURE_REQUEST_BYTES, "bounded fixture request");
+            bytes.push(stream.read_u8().await.expect("read request header"));
+            if bytes.ends_with(b"\r\n\r\n") {
+                break bytes.len();
+            }
+        };
+        let headers = std::str::from_utf8(&bytes).expect("HTTP headers are UTF-8");
+        let request_line = headers.lines().next().expect("request line").to_owned();
+        let content_length = headers
+            .lines()
+            .find_map(|line| {
+                let (name, value) = line.split_once(':')?;
+                name.eq_ignore_ascii_case("content-length")
+                    .then(|| value.trim().parse::<usize>().expect("content length"))
+            })
+            .unwrap_or(0);
+        assert!(content_length < MAX_FIXTURE_REQUEST_BYTES, "bounded fixture body");
+        bytes.resize(header_end + content_length, 0);
+        stream
+            .read_exact(&mut bytes[header_end..])
+            .await
+            .expect("read request body");
+        (request_line, bytes[header_end..].to_vec())
+    }
+
+    async fn serve_cache_http(listener: tokio::net::TcpListener) -> Vec<String> {
+        use tokio::io::AsyncWriteExt;
+        let mut stored = Vec::new();
+        let mut requests = Vec::new();
+        for method in ["PUT", "GET"] {
+            let (mut stream, _) = listener.accept().await.expect("accept cache request");
+            let (line, body) = receive_http_request(&mut stream).await;
+            assert_eq!(line, format!("{method} /fixture-bucket/responses/42 HTTP/1.1"));
+            requests.push(line);
+            let response_body = if method == "PUT" {
+                stored = body;
+                &[][..]
+            } else {
+                &stored
+            };
+            let header = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                response_body.len()
+            );
+            stream
+                .write_all(header.as_bytes())
+                .await
+                .expect("write response header");
+            stream.write_all(response_body).await.expect("write response body");
+            stream.shutdown().await.expect("close response");
+        }
+        requests
+    }
+
+    #[tokio::test]
+    async fn from_config_s3_uses_real_http_transport() {
+        const FIXTURE_TIMEOUT: Duration = Duration::from_secs(5);
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind isolated S3 fixture");
+        let address = listener.local_addr().expect("fixture address");
+        let config = HashMap::from([
+            ("endpoint".to_owned(), format!("http://{address}")),
+            ("bucket".to_owned(), "fixture-bucket".to_owned()),
+            ("region".to_owned(), "us-east-1".to_owned()),
+            ("access_key_id".to_owned(), "synthetic-fixture-access".to_owned()),
+            ("secret_access_key".to_owned(), "synthetic-fixture-secret".to_owned()),
+            ("disable_config_load".to_owned(), "true".to_owned()),
+            ("disable_ec2_metadata".to_owned(), "true".to_owned()),
+        ]);
+        let store = OpenDalCacheStore::from_config("s3", config, "responses/", Duration::from_secs(300))
+            .expect("configured S3 service must be available");
+        let mut server = tokio::spawn(serve_cache_http(listener));
+        let expected = dummy_response();
+        let expected_json = serde_json::to_value(&expected).expect("serialize expected response");
+        let outcome = tokio::time::timeout(FIXTURE_TIMEOUT, async {
+            store.put(42, "s3-request".to_owned(), expected).await;
+            store.get(42, "s3-request").await
+        })
+        .await;
+        if !matches!(&outcome, Ok(Some(_))) {
+            server.abort();
+            let _ = server.await;
+            panic!("actual S3 HTTP put/get must succeed: {outcome:?}");
+        }
+        let served = tokio::time::timeout(FIXTURE_TIMEOUT, &mut server).await;
+        server.abort();
+        assert_eq!(
+            served.expect("bounded HTTP fixture").expect("HTTP fixture task").len(),
+            2
+        );
+        let actual = outcome
+            .expect("bounded cache operations")
+            .expect("HTTP-backed cache hit");
+        assert_eq!(serde_json::to_value(actual).expect("serialize response"), expected_json);
     }
 
     #[test]

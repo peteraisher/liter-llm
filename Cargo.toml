@@ -44,7 +44,7 @@ dbg_macro = "deny"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(alef)'] }
 
 [workspace.package]
-version = "1.19.2"
+version = "1.19.3"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/xberg-io/liter-llm"
@@ -60,7 +60,7 @@ arc-swap = "1"
 async-trait = "0.1"
 
 aws-config = { version = "1", default-features = false, features = ["rustls"] }
-aws-sdk-secretsmanager = { version = "1", default-features = false, features = ["rustls"] }
+aws-sdk-secretsmanager = { version = "1", default-features = false, features = ["default-https-client", "rt-tokio"] }
 
 axum = { version = "0.8", features = ["macros", "ws"] }
 axum-extra = { version = "0.12", features = ["typed-header"] }
@@ -76,7 +76,7 @@ futures-util = "0.3"
 gcp_auth = { version = "0.12", default-features = false, features = ["ring"] }
 hex = "0.4"
 http = "1"
-jsonschema = "0.52"
+jsonschema = "0.55"
 jsonwebtoken = { version = "11", default-features = false, features = ["use_pem"] }
 
 magnus = "0.8"
@@ -86,12 +86,13 @@ napi = { version = "3", features = ["napi4", "serde-json", "async"] }
 napi-build = "2"
 napi-derive = "3"
 notify = { version = "8", features = ["macos_kqueue"] }
-opendal = { version = "0.58", default-features = false, features = [
+opendal = { version = "0.59.1", default-features = false, features = [
     "services-memory",
     "services-redis",
     "services-fs",
     "services-s3",
 ] }
+opendal-http-transport-reqwest = { version = "0.59.1", default-features = false }
 opentelemetry = { version = "0.32", features = ["metrics"] }
 opentelemetry-otlp = { version = "0.32", features = ["grpc-tonic", "trace", "metrics"] }
 opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"] }
@@ -103,7 +104,7 @@ rb-sys = "0.9"
 regex = "1"
 # ~keep Async / HTTP: TLS-agnostic base only; each crate adds TLS features target-conditionally.
 reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "multipart", "form"] }
-rmcp = { version = "3.1", features = [
+rmcp = { version = "3.2", features = [
     "server",
     "macros",
     "transport-io",

@@ -2,7 +2,7 @@
 id: legacy_rust_guides_error_handling
 language: rust
 target: rust
-level: syntax
+level: typecheck
 requires: []
 side_effect: network
 ---
@@ -29,14 +29,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.chat(request).await {
         Ok(response) => {
-            if let Some(text) = response.choices[0].message.content.as_deref() {
+            if let Some(text) = response.choices.first()
+                .and_then(|choice| choice.message.content.as_ref())
+                .and_then(|content| content.as_text())
+            {
                 println!("{text}");
             }
         }
         // Transient errors — worth retrying or falling back to another model.
         Err(e) if e.is_transient() => eprintln!("transient failure: {e}"),
         // Terminal errors — branch on specific variants where the response differs.
-        Err(LiterLlmError::Authentication { message }) => eprintln!("auth failed: {message}"),
+        Err(LiterLlmError::Authentication { message, .. }) => eprintln!("auth failed: {message}"),
         Err(LiterLlmError::ContextWindowExceeded { message }) => {
             eprintln!("prompt too long: {message}")
         }

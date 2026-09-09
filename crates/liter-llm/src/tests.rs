@@ -1454,7 +1454,7 @@ mod retry_tests {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, any(feature = "native-http", feature = "wasm-http")))]
 mod sse_tests {
     use crate::http::streaming::parse_sse_line;
 

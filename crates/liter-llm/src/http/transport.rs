@@ -153,7 +153,7 @@ impl TransportConfig {
     /// installs a resolver that combines this TTL with outbound-policy DNS
     /// validation, so DNS rebinding protection is preserved when both features
     /// are active.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     pub fn apply_to_builder(&self, builder: reqwest::ClientBuilder) -> reqwest::ClientBuilder {
         let builder = builder
             .pool_max_idle_per_host(self.pool_max_idle_per_host)
@@ -234,7 +234,7 @@ mod tests {
     /// client when a non-default `TransportConfig` is supplied.  If the method
     /// were not wired or had an incompatible API call this would fail to compile
     /// or panic at `.build()`.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     #[test]
     fn test_apply_to_builder_builds_client_with_non_default_config() {
         let cfg = TransportConfig::new()
@@ -255,7 +255,7 @@ mod tests {
 
     /// Verify that `apply_to_builder` with `http2_prior_knowledge = true` also
     /// produces a valid client.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     #[test]
     fn test_apply_to_builder_with_http2_prior_knowledge() {
         let cfg = TransportConfig::new().with_http2_prior_knowledge(true);
@@ -267,7 +267,7 @@ mod tests {
     }
 
     /// Verify that `apply_to_builder` with pooling disabled produces a valid client.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     #[test]
     fn test_apply_to_builder_with_pooling_disabled() {
         let cfg = TransportConfig::new()

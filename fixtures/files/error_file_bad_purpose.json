@@ -4,13 +4,34 @@
   "docs": {
     "topic": "files",
     "stem": "error-file-bad-purpose",
-    "title": "400 Bad Request when uploading a file with invalid purpose"
+    "title": "400 Bad Request when uploading a file with invalid purpose",
+    "coverage_exceptions": {
+      "node": {
+        "reason": "FilePurpose is a closed enum: the native constructor rejects invalid-purpose before HTTP, so a type-correct snippet cannot demonstrate this HTTP 400 response.",
+        "documentation": "crates/liter-llm-node/index.d.ts"
+      },
+      "wasm": {
+        "reason": "WasmFilePurpose contains only declared members; InvalidPurpose does not exist. Accessing that absent JavaScript member yields undefined and coerces to Assistants, so it cannot demonstrate an invalid-purpose HTTP request.",
+        "documentation": "crates/liter-llm-wasm/src/lib.rs"
+      }
+    }
   },
   "category": "files",
-  "tags": ["error-handling", "files"],
+  "tags": [
+    "error-handling",
+    "files"
+  ],
   "skip": {
-    "languages": ["rust", "python", "kotlin_android", "csharp"],
-    "reason": "Rust/Python/Kotlin/C#'s FilePurpose enum rejects invalid values at deserialization (Jackson in Kotlin, FilePurposeJsonConverter in C#) before reaching the HTTP layer, so no 400 is ever observed"
+    "languages": [
+      "rust",
+      "python",
+      "kotlin_android",
+      "csharp",
+      "ruby",
+      "node",
+      "wasm"
+    ],
+    "reason": "Typed FilePurpose bindings reject invalid values before HTTP (Rust/Python/Kotlin/C#/Ruby/Node). WASM exposes only declared enum members; an undeclared JavaScript member is undefined and coerces to Assistants, so it cannot send this invalid-purpose request. HTTP 400 is therefore not exercised by these bindings."
   },
   "call": "create_file",
   "input": {
