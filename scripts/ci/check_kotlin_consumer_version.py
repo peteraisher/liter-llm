@@ -1,6 +1,7 @@
 """Check Kotlin's registry dependency and AAR verification against the release version."""
 
 import re
+import sys
 from pathlib import Path
 
 import tomllib
@@ -17,16 +18,20 @@ def without_comments(content: str) -> str:
     while index < len(content):
         if content.startswith("/*", index):
             depth += 1
-            result.append(" ")
+            result.append("  ")
             index += 2
         elif depth and content.startswith("*/", index):
             depth -= 1
+            result.append("  ")
             index += 2
         elif depth:
+            result.append("\n" if content[index] == "\n" else " ")
             index += 1
         elif content.startswith("//", index):
             end = content.find("\n", index)
-            index = len(content) if end < 0 else end
+            end = len(content) if end < 0 else end
+            result.append(" " * (end - index))
+            index = end
         elif content[index] == '"':
             match = re.match(r'"""[\s\S]*?"""|"(?:\\.|[^"\\])*"', content[index:])
             if match is None:
@@ -54,6 +59,18 @@ def verify_coordinates(content: str, version: str) -> None:
             raise SystemExit(f"Kotlin consumer declaration {declaration} must select {version}; found {matches}")
 
 
+def synchronize_coordinates(content: str, version: str) -> str:
+    """Update both live coordinates while preserving comments and unrelated versions."""
+    pattern = rf'{re.escape(COORDINATE)}:([^"\s]+)'
+    matches = list(re.finditer(pattern, without_comments(content)))
+    if len(matches) != EXPECTED_COORDINATES:
+        raise SystemExit("Kotlin consumer must declare exactly two live coordinates")
+    for match in reversed(matches):
+        content = content[: match.start(1)] + version + content[match.end(1) :]
+    verify_coordinates(content, version)
+    return content
+
+
 def main() -> None:
     """Verify the source pins without resolving an unpublished Maven package."""
     root = Path(__file__).resolve().parents[2]
@@ -62,6 +79,8 @@ def main() -> None:
     if not isinstance(version, str) or not version:
         raise SystemExit("Kotlin consumer cannot be checked without a canonical Cargo version")
     path = root / "test_apps/kotlin_android/build.gradle.kts"
+    if "--sync" in sys.argv:
+        path.write_text(synchronize_coordinates(path.read_text(), version))
     verify_coordinates(path.read_text(), version)
     print(f"Kotlin consumer: {EXPECTED_COORDINATES} coordinates match {version}; registry resolution is separate")
 
