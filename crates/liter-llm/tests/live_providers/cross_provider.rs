@@ -74,7 +74,9 @@ async fn chat_parity_across_providers() {
     }
 
     #[cfg(feature = "bedrock")]
-    if std::env::var("AWS_ACCESS_KEY_ID").is_ok_and(|v| !v.is_empty()) {
+    if std::env::var("AWS_ACCESS_KEY_ID").is_ok_and(|v| !v.is_empty())
+        || std::env::var("AWS_BEARER_TOKEN_BEDROCK").is_ok_and(|v| !v.is_empty())
+    {
         let client = super::bedrock_client();
         match client
             .chat(simple_chat_request("bedrock/us.anthropic.claude-sonnet-4-6"))

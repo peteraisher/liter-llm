@@ -16,6 +16,7 @@
 //! | `MISTRAL_API_KEY` | Mistral AI |
 //! | `AZURE_OPENAI_API_KEY` | Azure OpenAI (+ `AZURE_OPENAI_ENDPOINT`) |
 //! | `AWS_ACCESS_KEY_ID` | AWS Bedrock (+ `AWS_SECRET_ACCESS_KEY`, requires `bedrock` feature) |
+//! | `AWS_BEARER_TOKEN_BEDROCK` | AWS Bedrock via a Bedrock API key |
 
 mod common;
 

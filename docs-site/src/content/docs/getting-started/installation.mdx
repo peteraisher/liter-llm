@@ -270,6 +270,13 @@ export AWS_ACCESS_KEY_ID="..."
 export AWS_SECRET_ACCESS_KEY="..."
 ```
 
+For AWS Bedrock, a Bedrock API key replaces the access-key pair -- it is sent as a bearer token and
+needs no request signing:
+
+```bash
+export AWS_BEARER_TOKEN_BEDROCK="ABSK..."
+```
+
 :::tip[You only need one key]
 liter-llm resolves the provider from the model prefix (`openai/gpt-4o`, `anthropic/claude-...`) and picks the matching environment variable automatically.
 :::
