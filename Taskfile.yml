@@ -141,10 +141,12 @@ tasks:
   test:release-regressions:
     desc: Run lightweight release guard regression tests
     cmds:
+      - python3 scripts/ci/sync_dart_consumer_version.py --check
       - >-
         uv run --locked --only-group dev --python 3.14 python -m pytest -q
         scripts/ci/test_task_lint_coverage.py
         scripts/ci/test_kotlin_consumer_version.py
+        scripts/ci/test_dart_consumer_version.py
         scripts/ci/test_node_public_outputs.py
 
   test:all:
