@@ -28,7 +28,16 @@ tasks:
   lint:prose:
     desc: Lint prose with textlint
     cmds:
-      - npx textlint 'docs-site/src/content/docs/**/*.{md,mdx}'
+      - pnpm --dir docs-site install --frozen-lockfile
+      - >-
+        docs-site/node_modules/.bin/textlint
+        --rules-base-directory "$PWD/docs-site/node_modules"
+        'docs-site/src/content/docs/**/*.{md,mdx}'
+
+  lint:prose:test:
+    desc: Verify real prose rules reject Markdown and MDX defects
+    cmds:
+      - python3 scripts/ci/check_prose_gate.py
 
   snippets:list:
     desc: List all documentation snippets discovered by alef

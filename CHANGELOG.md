@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-09
+
+### Breaking changes
+
+- Rust callers of `OpenDalCacheStore::new` and `OpenDalVectorStore::new` must pass an `opendal` 0.59 operator instead of 0.58. Upgrade the application dependency alongside Liter.
+- Go consumers must use `github.com/xberg-io/liter-llm/packages/go/v2` in imports and module requirements.
+
+### Changed
+
+- Upgrade Rust dependency requirements, including jsonschema 0.55, rmcp 3.2, and OpenDAL 0.59.1, and regenerate bindings with Alef 0.85.11.
+
+### Fixed
+
+- Serve actually compressed gzip bodies for mock HTTP fixtures that declare gzip encoding.
+- Propagate C# native failures from fallible void calls and preserve numeric error codes in typed exceptions.
+- Narrow Java boolean native return values before comparison while retaining the compatible wide call layout.
+- Resolve the current Zig release archive and its actual content hash before running published consumer tests.
+- Render Cargo installation commands in the Rust package README.
+
+- Keep task lint coverage compatible with current Poly reports while rejecting formatter errors.
+- Update Ruby E2E Faraday and JSON dependencies to resolve three security advisories.
+- Synchronize Java and Kotlin test harnesses with the patched Jackson dependencies used by generated packages. Verify both Kotlin registry pins against the release version before native tests.
+- Update vulnerable JavaScript tooling and documentation dependencies, preserving scoped security overrides across regeneration.
+- Include every generated Zig streaming test in the native test build and check source-to-target coverage before running it.
+- Align PHP enum conversions with enabled core features and require the expected native exception in Ruby streaming error tests.
+
+- Build Swift native artifacts for the advertised macOS 13 and iOS 16 minimum versions.
+
+- Remove five Rust advisories by selecting the modern AWS Secrets Manager transport with Tokio runtime support and updating rust_decimal.
+
+- Preserve complete Python streaming requests and Ruby renamed and internally tagged fields.
+- Accept both native Elixir client references and typed wrappers in top-level client methods.
+- Make generated PHP error tests assert actual exceptions and Kotlin content tests check nonempty text.
+- Correct Swift stream and content assertions, and make generated streaming examples inspect individual chunks and release native resources.
+- Preserve Alef-owned Node declarations and loaders during native builds.
+- Remove obsolete standalone Swift bridge headers so the generated umbrella module passes strict compiler checks.
+- Resolve Java example dependencies from the Maven manifest and distinguish mocked fixture URLs from hosted samples.
+- Generate numeric C handles for file and batch list calls.
+
+- Correct the C# client factory and Java exception handling in documentation examples, and type-check them.
+
+- Synchronize the C# consumer using its actual `XbergIo.LiterLlm` NuGet package reference.
+- Restore Kotlin Android publishing after verifying the regenerated AAR and JNI bridge.
+
+- Refresh the root workspace lockfile from a current WASM build, including all six native Node packages, so frozen installation matches the release manifests.
+
+- Install prose tools from the standalone documentation workspace and check MDX as well as Markdown with real failure controls.
+
+- Refresh Python and Rust consumer locks to the current release.
+
+- Remove endpoint URLs from transport-retry warnings so URL path and query credentials
+  do not reach application logs; retain retry counts and the transport error category.
+
 ## [1.19.2] - 2026-09-03
 
 ## [1.19.1] - 2026-09-01

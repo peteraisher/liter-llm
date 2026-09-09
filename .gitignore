@@ -1,4 +1,5 @@
 # Build output
+/e2e/c/ffi/
 target/
 build/
 dist/
@@ -317,3 +318,17 @@ poly.local.toml
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .ai-rulez/.generated-manifest.json
 # END ai-rulez
+
+# ~keep Alef verifies these generated wrapper artifacts in fresh checkouts.
+!packages/kotlin-android/gradle/wrapper/gradle-wrapper.jar
+!test_apps/kotlin_android/gradle/wrapper/gradle-wrapper.jar
+!e2e/java/.mvn/
+e2e/java/.mvn/*
+!e2e/java/.mvn/wrapper/
+e2e/java/.mvn/wrapper/*
+!e2e/java/.mvn/wrapper/maven-wrapper.properties
+!test_apps/java/.mvn/
+test_apps/java/.mvn/*
+!test_apps/java/.mvn/wrapper/
+test_apps/java/.mvn/wrapper/*
+!test_apps/java/.mvn/wrapper/maven-wrapper.properties

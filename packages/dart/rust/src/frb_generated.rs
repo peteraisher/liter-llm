@@ -4971,8 +4971,8 @@ fn wire__crate__encode_data_url_impl(
     )
 }
 #[cfg(any(
-    all(feature = "native-http", not(target_os = "windows")),
-    all(feature = "native-http", target_os = "windows")
+    all(any(feature = "native-http", feature = "opendal-cache"), not(target_os = "windows")),
+    all(any(feature = "native-http", feature = "opendal-cache"), target_os = "windows")
 ))]
 fn wire__crate__ensure_crypto_provider_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
@@ -9640,8 +9640,8 @@ fn pde_ffi_dispatcher_primary_impl(
         157 => wire__crate__decode_data_url_impl(port, ptr, rust_vec_len, data_len),
         158 => wire__crate__encode_data_url_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(any(
-            all(feature = "native-http", not(target_os = "windows")),
-            all(feature = "native-http", target_os = "windows")
+            all(any(feature = "native-http", feature = "opendal-cache"), not(target_os = "windows")),
+            all(any(feature = "native-http", feature = "opendal-cache"), target_os = "windows")
         ))]
         159 => wire__crate__ensure_crypto_provider_impl(port, ptr, rust_vec_len, data_len),
         160 => wire__crate__install_catalog_overlay_from_str_impl(port, ptr, rust_vec_len, data_len),

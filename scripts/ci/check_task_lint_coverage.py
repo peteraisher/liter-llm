@@ -104,8 +104,19 @@ def poly_report(paths: list[Path]) -> list[dict]:
             "This check must fail loudly rather than assume zero skips.\n"
             f"parse error: {exc}\npoly said:\n{result.stdout}\n{result.stderr}"
         ) from exc
-    if not isinstance(report, list):
-        raise SystemExit(f"poly's JSON report is {type(report).__name__}, expected a list:\n{report}")
+    return report_rows(report)
+
+
+def report_rows(report: object) -> list[dict]:
+    """Normalize supported Poly reports and reject formatter failures."""
+    if isinstance(report, dict):
+        if report.get("errors") or report.get("summary", {}).get("errored"):
+            raise SystemExit(f"poly reported formatter errors:\n{report}")
+        report = report.get("results")
+    if not isinstance(report, list) or any(not isinstance(entry, dict) for entry in report):
+        raise SystemExit(f"poly's JSON report must contain a per-file results list:\n{report}")
+    if any(entry.get("error") for entry in report):
+        raise SystemExit(f"poly reported formatter errors:\n{report}")
     return report
 
 

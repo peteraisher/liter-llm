@@ -151,7 +151,7 @@ pub use tenant::{InMemoryKeyResolver, KeyResolver, KeyResolverError, ResolvedKey
 ///
 /// Windows builds use native-tls (SChannel) via reqwest, so rustls is not
 /// present and no crypto provider installation is needed.
-#[cfg(all(feature = "native-http", not(target_os = "windows")))]
+#[cfg(all(any(feature = "native-http", feature = "opendal-cache"), not(target_os = "windows")))]
 pub fn ensure_crypto_provider() {
     use std::sync::Once;
     static INIT: Once = Once::new();
@@ -164,5 +164,5 @@ pub fn ensure_crypto_provider() {
 /// No-op on Windows: reqwest uses native-tls (SChannel), so no rustls provider
 /// installation is needed. All callers use the same call site regardless of
 /// platform.
-#[cfg(all(feature = "native-http", target_os = "windows"))]
+#[cfg(all(any(feature = "native-http", feature = "opendal-cache"), target_os = "windows"))]
 pub fn ensure_crypto_provider() {}

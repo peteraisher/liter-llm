@@ -452,6 +452,27 @@ mod tests {
     #[tokio::test]
     #[serial_test::serial(vertex_adc_env)]
     async fn fixed_metadata_client_ignores_environment_proxies() {
+        const CHILD_MARKER: &str = "LITER_VERTEX_METADATA_PROXY_CHILD";
+        if std::env::var_os(CHILD_MARKER).is_none() {
+            let output = tokio::time::timeout(
+                std::time::Duration::from_secs(10),
+                tokio::process::Command::new(std::env::current_exe().expect("test executable"))
+                    .args([
+                        "auth::vertex_adc::tests::fixed_metadata_client_ignores_environment_proxies",
+                        "--exact",
+                        "--nocapture",
+                    ])
+                    .env(CHILD_MARKER, "1")
+                    .kill_on_drop(true)
+                    .output(),
+            )
+            .await
+            .expect("isolated metadata proxy test deadline")
+            .expect("launch isolated metadata proxy test");
+            assert!(output.status.success(), "isolated metadata proxy test: {output:?}");
+            assert!(String::from_utf8_lossy(&output.stdout).contains("1 passed; 0 failed; 0 ignored"));
+            return;
+        }
         let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind proxy listener");
         listener.set_nonblocking(true).expect("set proxy listener nonblocking");
         let proxy_url = format!("http://{}", listener.local_addr().expect("proxy listener address"));

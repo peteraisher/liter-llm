@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.82.2"
+alef_version = "0.85.11"
 languages = [
   "python",
   "node",
@@ -34,6 +34,7 @@ user_owned = [
   "e2e/java/pom.xml",
   "e2e/kotlin_android/build.gradle.kts",
   "e2e/node/package.json",
+  "e2e/wasm/pnpm-workspace.yaml",
   "e2e/zig/build.zig",
   "test_apps/csharp/LiterLlm.E2eTests.csproj",
   "test_apps/dart/pubspec.yaml",
@@ -87,6 +88,10 @@ cwd = "."
 manifest = "crates/liter-llm/Cargo.toml"
 env = { CARGO_BUILD_JOBS = "4", CARGO_TARGET_DIR = "target/snippet-validation" }
 
+[workspace.docs.snippets.sessions.rust.rust_dependencies]
+futures = { version = "0.3" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
 [workspace.docs.snippets.sessions.python]
 cwd = "packages/python"
 manifest = "packages/python/pyproject.toml"
@@ -122,7 +127,7 @@ env = { CGO_ENABLED = "1" }
 
 [workspace.docs.snippets.sessions.java]
 cwd = "packages/java"
-env = { CLASSPATH = "target/classes" }
+manifest = "packages/java/pom.xml"
 
 [workspace.docs.snippets.sessions.csharp]
 cwd = "packages/csharp"
@@ -325,13 +330,29 @@ ist = "ist"
 "crates/liter-llm/src/client/mod.rs" = ["file-too-long"]
 "crates/liter-llm/src/http/eventstream.rs" = ["function-too-long", "nesting-too-deep", "too-many-parameters"]
 "crates/liter-llm/src/http/streaming.rs" = ["function-too-long", "too-many-parameters"]
-"crates/liter-llm/src/provider/anthropic.rs" = ["cyclomatic-complexity", "file-too-long", "function-too-long", "nesting-too-deep"]
+"crates/liter-llm/src/provider/anthropic.rs" = [
+  "cyclomatic-complexity",
+  "file-too-long",
+  "function-too-long",
+  "nesting-too-deep",
+]
 "crates/liter-llm/src/provider/azure.rs" = ["nesting-too-deep"]
-"crates/liter-llm/src/provider/bedrock.rs" = ["cyclomatic-complexity", "file-too-long", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"crates/liter-llm/src/provider/bedrock.rs" = [
+  "cyclomatic-complexity",
+  "file-too-long",
+  "function-too-long",
+  "nesting-too-deep",
+  "too-many-parameters",
+]
 "crates/liter-llm/src/provider/cohere.rs" = ["function-too-long"]
 "crates/liter-llm/src/provider/mod.rs" = ["cyclomatic-complexity", "file-too-long"]
 "crates/liter-llm/src/provider/outbound_policy.rs" = ["file-too-long"]
-"crates/liter-llm/src/provider/vertex.rs" = ["cyclomatic-complexity", "file-too-long", "function-too-long", "nesting-too-deep"]
+"crates/liter-llm/src/provider/vertex.rs" = [
+  "cyclomatic-complexity",
+  "file-too-long",
+  "function-too-long",
+  "nesting-too-deep",
+]
 "crates/liter-llm/src/realtime/openai.rs" = ["function-too-long"]
 "crates/liter-llm/src/streaming.rs" = ["function-too-long", "nesting-too-deep"]
 "crates/liter-llm/src/tests.rs" = ["file-too-long"]
@@ -538,7 +559,7 @@ lib_name = "liter_llm_ffi"
 extra_features = ["wasm-http"]
 
 [crates.go]
-module = "github.com/xberg-io/liter-llm/packages/go"
+module = "github.com/xberg-io/liter-llm/packages/go/v2"
 package_name = "literllm"
 
 [crates.java]
@@ -906,18 +927,24 @@ e2e = [
 
 [crates.test.swift]
 precondition = "command -v swift >/dev/null 2>&1"
-before = "cargo build --release -p liter-llm-swift && cargo build --release -p liter-llm-ffi && cargo build --manifest-path e2e/rust/Cargo.toml --bin mock-server --release"
+before = "task swift:build && cargo build --manifest-path e2e/rust/Cargo.toml --bin mock-server --release"
 e2e = "scripts/e2e/run-with-mock-server.sh 'cd e2e/swift_e2e && swift test'"
 
 [crates.test.zig]
 precondition = "command -v zig >/dev/null 2>&1"
 before = "cargo build -p liter-llm-ffi --release && cargo build --manifest-path e2e/rust/Cargo.toml --bin mock-server --release"
-e2e = "scripts/e2e/run-with-mock-server.sh 'cd e2e/zig && zig build test'"
+e2e = [
+  "python3 scripts/ci/check_zig_test_targets.py",
+  "scripts/e2e/run-with-mock-server.sh 'cd e2e/zig && zig build test --summary all'",
+]
 
 [crates.test.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
 before = "cargo build --release -p liter-llm-ffi -p liter-llm-jni && cargo build --manifest-path e2e/rust/Cargo.toml --bin mock-server --release"
-e2e = "scripts/e2e/run-with-mock-server.sh 'cd e2e/kotlin_android && gradle test --no-daemon'"
+e2e = [
+  "python3 scripts/ci/check_kotlin_consumer_version.py",
+  "scripts/e2e/run-with-mock-server.sh 'cd e2e/kotlin_android && gradle test --no-daemon'",
+]
 
 [crates.publish]
 core_crate = "crates/liter-llm"
@@ -1009,6 +1036,8 @@ fields_method_calls = ["status_code"]
 
 [crates.e2e.snippets]
 output = "docs-site/src/snippets"
+# ~keep Fixture URLs describe mocked provider responses; this corpus has no hosted sample documents.
+mock_only = true
 # ~keep alef 0.67.6 resolves these globs against the project root, not against
 # ~keep `output`; a path relative to `output` is rejected with a naming error.
 # ~keep Every entry is a tutorial/README source that no fixture can produce: they
@@ -1787,7 +1816,7 @@ extra_args = ["null"]
 
 [crates.e2e.calls.list_files.overrides.c]
 result_type = "FileListResponse"
-extra_args = ["NULL"]
+extra_args = ["0"]
 
 [crates.e2e.calls.list_files.overrides.swift]
 extra_args = ["nil"]
@@ -1983,7 +2012,7 @@ extra_args = ["null"]
 
 [crates.e2e.calls.list_batches.overrides.c]
 result_type = "BatchListResponse"
-extra_args = ["NULL"]
+extra_args = ["0"]
 
 [crates.e2e.calls.list_batches.overrides.swift]
 extra_args = ["nil"]
@@ -2151,7 +2180,7 @@ name = "@xberg-io/liter-llm-wasm"
 name = "liter_llm"
 
 [crates.e2e.registry.packages.go]
-module = "github.com/xberg-io/liter-llm/packages/go"
+module = "github.com/xberg-io/liter-llm/packages/go/v2"
 
 [crates.e2e.registry.packages.java]
 name = "io.xberg.literllm:liter-llm"
@@ -2178,7 +2207,7 @@ name = "liter_llm_ffi"
 name = "LiterLlm"
 
 [crates.e2e.registry.packages.zig]
-hash = "liter_llm-1.19.2-ITuy7j8Hy2Yavk0BjGZ43I0Ix2GL"
+hash = "STALE_HASH_REGENERATE"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "xberg-io/homebrew-tap"
@@ -2221,18 +2250,34 @@ replace = "<artifactId>liter-llm</artifactId>\n            <version>{version}</v
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/csharp/LiterLlm.E2eTests.csproj"
-search = 'Include="LiterLlm" Version="[^"]*"'
-replace = 'Include="LiterLlm" Version="{version}"'
-
-[[workspace.sync.text_replacements]]
-path = "test_apps/php/composer.json"
-search = '"xberg-io/liter-llm": "[^"]*"'
-replace = '"xberg-io/liter-llm": "{version}"'
+search = 'Include="XbergIo.LiterLlm" Version="[^"]*"'
+replace = 'Include="XbergIo.LiterLlm" Version="{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/go/go.mod"
-search = 'github\.com/xberg-io/liter-llm/packages/go v[0-9][^\s]*'
-replace = "github.com/xberg-io/liter-llm/packages/go v{version}"
+search = 'github\.com/xberg-io/liter-llm/packages/go(?:/v2)? v[0-9][^\s]*'
+replace = "github.com/xberg-io/liter-llm/packages/go/v2 v{version}"
+
+[[workspace.sync.text_replacements]]
+path = "e2e/go/go.mod"
+search = 'github\.com/xberg-io/liter-llm/packages/go(?:/v2)? v[0-9][^\s]*'
+replace = "github.com/xberg-io/liter-llm/packages/go/v2 v{version}"
+
+[[workspace.sync.text_replacements]]
+path = "packages/go/go.mod"
+search = '(?m)^module github\.com/xberg-io/liter-llm/packages/go(?:/v2)?$'
+replace = "module github.com/xberg-io/liter-llm/packages/go/v2"
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/zig/build.zig.zon"
+search = 'https://github\.com/xberg-io/liter-llm/releases/download/v[^/]+/liter-llm-zig-v[^" ]+\.tar\.gz'
+replace = "https://github.com/xberg-io/liter-llm/releases/download/v{version}/liter-llm-zig-v{version}.tar.gz"
+
+# ~keep The published archive determines the hash; prepare:zig resolves it after publication.
+[[workspace.sync.text_replacements]]
+path = "test_apps/zig/build.zig.zon"
+search = '(?m)^\s*\.hash = "[^"\n]+",\n'
+replace = ""
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/rust/Cargo.toml"
@@ -2251,6 +2296,10 @@ replace = 'release/swift/{version}'
 path = "plugin/package.json"
 search = '"version": "[^"]*"'
 replace = '"version": "{version}"'
+
+[crates.package_metadata]
+homepage = "https://github.com/xberg-io/liter-llm"
+issues = "https://github.com/xberg-io/liter-llm/issues"
 
 [crates.scaffold]
 description = "Universal LLM API client with Rust-powered polyglot bindings."
@@ -2379,7 +2428,7 @@ tool_calling = "getting-started/tool_calling.md"
 template = "go.md"
 output_path = "packages/go/README.md"
 name = "Go"
-package_name = "github.com/xberg-io/liter-llm/packages/go"
+package_name = "github.com/xberg-io/liter-llm/packages/go/v2"
 badge_url = "https://img.shields.io/github/v/tag/xberg-io/liter-llm?label=Go&color=007ec6"
 docs_url = "https://github.com/xberg-io/liter-llm"
 description = "Universal LLM API client for Go. Access 165 LLM providers through a single interface with idiomatic Go API, context-aware async support, and CGO-based native performance."

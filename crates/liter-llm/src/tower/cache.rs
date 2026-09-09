@@ -1043,8 +1043,6 @@ where
 mod tests {
     use std::sync::atomic::Ordering;
 
-    use tower::{Layer as _, Service as _};
-
     use super::*;
     use crate::tower::service::LlmService;
     use crate::tower::tests_common::{MockClient, chat_req};

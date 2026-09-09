@@ -547,22 +547,29 @@ pub(crate) fn outbound_forbidden_from_reqwest(_error: &reqwest::Error) -> Option
 
 #[cfg(test)]
 mod tests {
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     use std::io::{Read, Write};
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     use std::net::{SocketAddr, TcpListener};
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     use std::sync::Arc;
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     use std::sync::atomic::{AtomicBool, Ordering};
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     use std::time::{Duration, Instant};
 
     use serial_test::serial;
 
     use super::*;
 
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     struct OneShotServer {
         address: SocketAddr,
         hit: Arc<AtomicBool>,
         handle: Option<std::thread::JoinHandle<()>>,
     }
 
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     impl OneShotServer {
         fn start(response: String) -> Self {
             let listener = TcpListener::bind("127.0.0.1:0").expect("bind redirect test server");
@@ -766,6 +773,7 @@ mod tests {
 
     #[test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     fn redirect_validation_rejects_cross_origin_under_deny_private() {
         with_policy(OutboundPolicy::DenyPrivate, || {
             let previous = Url::parse("https://api.example.com/v1/chat").expect("previous URL");
@@ -780,6 +788,7 @@ mod tests {
 
     #[test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     fn redirect_validation_allows_same_origin_under_deny_private() {
         with_policy(OutboundPolicy::DenyPrivate, || {
             let previous = Url::parse("https://api.example.com/v1/chat").expect("previous URL");
@@ -790,6 +799,7 @@ mod tests {
 
     #[test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     fn credential_free_redirect_still_rejects_private_target() {
         with_policy(OutboundPolicy::DenyPrivate, || {
             let previous = Url::parse("https://github.com/example/catalog.json").expect("previous URL");
@@ -804,6 +814,7 @@ mod tests {
 
     #[test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     fn credential_free_redirect_rejects_https_to_http_downgrade_when_policy_is_off() {
         with_policy(OutboundPolicy::Off, || {
             let previous = Url::parse("https://github.com/example/catalog.json").expect("previous URL");
@@ -817,6 +828,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     fn guarded_resolver_rejects_private_connection_address() {
         let addresses = [SocketAddr::from(([127, 0, 0, 1], 443))];
         let result = resolver_impl::validate_addrs(OutboundPolicy::DenyPrivate, "api.example.com", &addresses);
@@ -828,6 +840,7 @@ mod tests {
 
     #[tokio::test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     async fn configured_builder_rejects_private_hostname_resolution() {
         let target = OneShotServer::start(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}".to_string(),
@@ -851,6 +864,7 @@ mod tests {
 
     #[tokio::test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     async fn credential_free_client_allows_policy_checked_cross_origin_redirect() {
         let target = OneShotServer::start(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}".to_string(),
@@ -884,6 +898,7 @@ mod tests {
 
     #[tokio::test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     async fn redirect_policy_failure_is_outbound_forbidden_and_not_retried() {
         let target = OneShotServer::start(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}".to_string(),
@@ -930,6 +945,7 @@ mod tests {
 
     #[tokio::test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     async fn redirect_policy_rejects_allowed_to_unallowed_public_origin() {
         let target = OneShotServer::start(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}".to_string(),
@@ -959,6 +975,7 @@ mod tests {
 
     #[tokio::test]
     #[serial(outbound_policy)]
+    #[cfg(all(feature = "native-http", not(target_arch = "wasm32")))]
     async fn redirect_policy_rejects_allowed_to_private_origin() {
         let target = OneShotServer::start(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}".to_string(),

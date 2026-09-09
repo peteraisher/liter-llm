@@ -17,7 +17,7 @@ import (
 	"log"
 	"os"
 
-	ll "github.com/xberg-io/liter-llm/packages/go"
+	ll "github.com/xberg-io/liter-llm/packages/go/v2"
 )
 
 func main() {

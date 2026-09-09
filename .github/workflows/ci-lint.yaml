@@ -60,3 +60,21 @@ jobs:
       setup-ruby: true
       setup-dart: true
       setup-elixir: true
+
+  release-regressions:
+    name: Release regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Python
+        uses: xberg-io/actions/setup-python-env@v1
+        with:
+          python-version: "3.14"
+          cache-prefix: release-regressions
+          install-command: uv sync --locked --only-group dev --python 3.14 --no-install-project --no-install-workspace
+      - name: Install Task
+        uses: xberg-io/actions/install-task@v1
+      - name: Run release regression tests
+        run: task test:release-regressions
+        shell: bash

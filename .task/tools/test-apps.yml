@@ -120,10 +120,19 @@ tasks:
       - dart pub get
       - dart test test/smoke_test.dart
 
+  prepare:zig:
+    desc: Resolve the current published Zig archive and its content hash
+    dir: test_apps/zig
+    cmds:
+      - >-
+        zig fetch --save=liter_llm
+        https://github.com/xberg-io/liter-llm/releases/download/v{{.VERSION}}/liter-llm-zig-v{{.VERSION}}.tar.gz
+
   smoke:zig:
     desc: Run Zig test_app smoke test
     dir: test_apps/zig
     cmds:
+      - task: prepare:zig
       - zig build test
 
   smoke:kotlin_android:
@@ -297,6 +306,7 @@ tasks:
     desc: Run Zig test_app comprehensive tests
     dir: test_apps/zig
     cmds:
+      - task: prepare:zig
       - zig build test
 
   comprehensive:kotlin_android:

@@ -83,7 +83,7 @@ docker pull ghcr.io/xberg-io/liter-llm
 | Python | `pip install liter-llm` |
 | Node.js | `pnpm add @xberg-io/liter-llm` |
 | Rust | `cargo add liter-llm` |
-| Go | `go get github.com/xberg-io/liter-llm/packages/go` |
+| Go | `go get github.com/xberg-io/liter-llm/packages/go/v2` |
 | Ruby | `gem install liter_llm` |
 | PHP | `composer require xberg-io/liter-llm` |
 | C# | `dotnet add package XbergIo.LiterLlm` |

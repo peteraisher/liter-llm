@@ -109,6 +109,7 @@ pub trait HealthChecker: Send + Sync + 'static {
 /// connection errors, and 4xx/5xx responses are [`HealthStatus::Unhealthy`].
 #[derive(Debug, Clone)]
 #[cfg_attr(alef, alef(skip))]
+#[cfg(feature = "native-http")]
 pub struct HttpProbeHealthChecker {
     /// HTTP client used for probes.  Shared across all probe tasks.
     ///
@@ -124,6 +125,7 @@ pub struct HttpProbeHealthChecker {
     probe_urls: std::collections::HashMap<String, String>,
 }
 
+#[cfg(feature = "native-http")]
 impl HttpProbeHealthChecker {
     /// Create a new checker with optional URL overrides.
     ///
@@ -146,6 +148,7 @@ impl HttpProbeHealthChecker {
     }
 }
 
+#[cfg(feature = "native-http")]
 impl HealthChecker for HttpProbeHealthChecker {
     fn check(
         &self,
@@ -514,8 +517,6 @@ mod tests {
     use std::sync::Mutex;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::task::{Context, Poll};
-
-    use tower::{Layer as _, Service as _};
 
     use super::*;
     use crate::tower::service::LlmService;

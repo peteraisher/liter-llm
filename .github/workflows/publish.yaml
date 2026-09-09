@@ -92,13 +92,7 @@ jobs:
       release_php: ${{ steps.meta.outputs.release_php }}
       release_homebrew: ${{ steps.meta.outputs.release_homebrew }}
       release_scoop: ${{ steps.meta.outputs.release_scoop }}
-      # kotlin-android is deliberately OFF this pipeline, not merely absent from
-      # `available-targets` below: the generated SingleflightResult.kt calls
-      # LiterLlmBridge.nativeFreeSingleflightResult, which alef emits on neither the bridge
-      # nor the JNI side, so the AAR cannot build. The build/upload/publish jobs are kept
-      # intact and gated on this value. To re-enable, add `kotlin` back to
-      # `available-targets` and restore this to `steps.meta.outputs.release_kotlin`. ~keep
-      release_kotlin: "false"
+      release_kotlin: ${{ steps.meta.outputs.release_kotlin }}
       release_dart: ${{ steps.meta.outputs.release_dart }}
       release_zig: ${{ steps.meta.outputs.release_zig }}
       release_swift: ${{ steps.meta.outputs.release_swift }}
@@ -139,7 +133,7 @@ jobs:
           # publish job never runs; a name alef does not recognise hard-errors `prepare` and takes
           # the whole pipeline down. `scoop` is safe on both counts as of alef 0.79.5, which
           # carries it in the known-target list and treats it as implying `cli`.
-          available-targets: "crates,python,node,wasm,ruby,go,java,elixir,csharp,php,homebrew,scoop,dart,zig,swift"
+          available-targets: "crates,python,node,wasm,ruby,go,java,elixir,csharp,php,homebrew,scoop,kotlin,dart,zig,swift"
 
       # ~keep The publish actions compare `expected-version` against the artifact's own version
       # string, and two ecosystems respell a semver prerelease: PyPI dist filenames carry the
@@ -534,7 +528,7 @@ jobs:
       - run: npm install -g @napi-rs/cli
         shell: bash
       - name: Build NAPI binding
-        run: napi build --release --platform --target ${{ matrix.napi_target }}
+        run: napi build --release --platform --no-js --dts index.native.d.ts --target ${{ matrix.napi_target }}
         working-directory: crates/liter-llm-node
         shell: bash
       - uses: actions/upload-artifact@v7
@@ -2413,6 +2407,9 @@ jobs:
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 180
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "13.0"
+      IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     outputs:
       checksum: ${{ steps.checksum.outputs.checksum }}
       reused: ${{ steps.check-existing.outputs.reused }}

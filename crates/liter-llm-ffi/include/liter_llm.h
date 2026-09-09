@@ -8992,7 +8992,7 @@ uintptr_t literllm_encode_data_url_len(const uint8_t *_bytes,
                                        uintptr_t _bytes_len,
                                        const char *_mime);
 
-#if ((defined(LITERLLM_FEATURE_NATIVE_HTTP) && !defined(SKIF_WINDOWS)) || (defined(LITERLLM_FEATURE_NATIVE_HTTP) && defined(SKIF_WINDOWS)))
+#if (((defined(LITERLLM_FEATURE_NATIVE_HTTP) || defined(LITERLLM_FEATURE_OPENDAL_CACHE)) && !defined(SKIF_WINDOWS)) || ((defined(LITERLLM_FEATURE_NATIVE_HTTP) || defined(LITERLLM_FEATURE_OPENDAL_CACHE)) && defined(SKIF_WINDOWS)))
 /**
  * Install the `ring` crypto provider as the rustls process default, idempotently.
  *

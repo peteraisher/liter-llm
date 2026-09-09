@@ -629,6 +629,35 @@ pub fn build(b: *std.Build) void {
     speech_run.step.dependOn(&smoke_run.step);
     test_step.dependOn(&speech_run.step);
 
+    const streaming_module = b.createModule(.{
+        .root_source_file = b.path("src/streaming_test.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    streaming_module.addImport("liter_llm", liter_llm_module);
+    const streaming_tests = b.addTest(.{
+        .name = "streaming_test",
+        .root_module = streaming_module,
+        .use_llvm = true,
+    });
+    streaming_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
+    const streaming_run = b.addRunArtifact(streaming_tests);
+    if (mock_server_url) |_url| {
+        streaming_run.setEnvironmentVariable("MOCK_SERVER_URL", _url);
+    }
+    if (mock_servers_json) |_json| {
+        streaming_run.setEnvironmentVariable("MOCK_SERVERS", _json);
+    }
+    {
+        var _it = mock_servers_map.iterator();
+        while (_it.next()) |_entry| {
+            streaming_run.setEnvironmentVariable(_entry.key_ptr.*, _entry.value_ptr.*);
+        }
+    }
+    streaming_run.step.dependOn(&speech_run.step);
+    test_step.dependOn(&streaming_run.step);
+
     const tool_calling_module = b.createModule(.{
         .root_source_file = b.path("src/tool_calling_test.zig"),
         .target = target,
@@ -655,7 +684,7 @@ pub fn build(b: *std.Build) void {
             tool_calling_run.setEnvironmentVariable(_entry.key_ptr.*, _entry.value_ptr.*);
         }
     }
-    tool_calling_run.step.dependOn(&speech_run.step);
+    tool_calling_run.step.dependOn(&streaming_run.step);
     test_step.dependOn(&tool_calling_run.step);
 
     const transcribe_module = b.createModule(.{

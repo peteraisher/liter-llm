@@ -29,6 +29,8 @@ includes:
     taskfile: .task/languages/php.yml
   csharp:
     taskfile: .task/languages/csharp.yml
+  swift:
+    taskfile: .task/languages/swift.yml
   _build_wf:
     taskfile: .task/workflows/build.yml
     internal: true
@@ -135,6 +137,15 @@ tasks:
     desc: Run Rust unit and FFI tests
     cmds:
       - task: rust:test
+
+  test:release-regressions:
+    desc: Run lightweight release guard regression tests
+    cmds:
+      - >-
+        uv run --locked --only-group dev --python 3.14 python -m pytest -q
+        scripts/ci/test_task_lint_coverage.py
+        scripts/ci/test_kotlin_consumer_version.py
+        scripts/ci/test_node_public_outputs.py
 
   test:all:
     desc: Run ALL test suites across all languages
@@ -244,7 +255,7 @@ tasks:
       # spawns a doomed toolchain per snippet and cannot pass by construction. Discovery, the
       # reference-page audit and gap detection still run. Use `task alef:snippets` after
       # `alef build` when you actually want validation.
-      - alef all --clean --skip-snippet-validation
+      - alef all --clean --skip-compile --skip-snippet-validation
 
   alef:all:
     desc: Run full alef pipeline (extract + generate + stubs + scaffold + readme + docs + e2e)
@@ -259,7 +270,17 @@ tasks:
   alef:snippets:
     desc: Validate documentation snippets (needs built artifacts; run after alef build)
     cmds:
+      - mvn -B -q -f packages/java/pom.xml -DincludeScope=runtime dependency:copy-dependencies
+      - task: alef:snippets:kotlin:prepare
       - alef snippets check
+
+  alef:snippets:kotlin:prepare:
+    desc: Build Android classes required by Kotlin snippet typechecking
+    dir: packages/kotlin-android
+    env:
+      GRADLE_USER_HOME: .gradle
+    cmds:
+      - ./gradlew assembleDebug --no-daemon --max-workers=1
 
   generate:all:
     desc: Regenerate all generated code

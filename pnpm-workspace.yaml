@@ -1,5 +1,6 @@
 packages:
   - "crates/liter-llm-node"
+  - "crates/liter-llm-node/npm/*"
   - "crates/liter-llm-wasm"
   - "e2e/node"
   - "e2e/wasm"
@@ -9,6 +10,13 @@ minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - "@xberg-io/*"
 
+linkWorkspacePackages: true
 sharedWorkspaceLockfile: true
 autoInstallPeers: true
 hoist: true
+overrides:
+  "vite@>=7.0.0 <7.3.5": "7.3.5"
+  "vite@>=8.0.0 <8.0.16": "8.0.16"
+  "postcss@>=8.0.0 <8.5.23": "8.5.23"
+  "nanoid@>=3.0.0 <3.3.18": "3.3.18"
+  "esbuild@>=0.27.0 <0.28.1": "0.28.1"

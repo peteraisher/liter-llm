@@ -898,7 +898,6 @@ mod tests {
 
     use futures_core::Stream;
     use rand::SeedableRng;
-    use tower::Service as _;
 
     use super::*;
     use crate::tower::service::LlmService;

@@ -2,7 +2,7 @@
 id: legacy_csharp_guides_error_handling
 language: csharp
 target: csharp
-level: syntax
+level: typecheck
 requires: []
 side_effect: network
 ---
@@ -12,7 +12,7 @@ side_effect: network
 ```csharp
 using LiterLlm;
 
-using var client = LiterLlmLib.CreateClient(
+using var client = LiterLlmConverter.CreateClient(
     apiKey: Environment.GetEnvironmentVariable("OPENAI_API_KEY")!,
     baseUrl: null, timeoutSecs: null, maxRetries: null, modelHint: null);
 

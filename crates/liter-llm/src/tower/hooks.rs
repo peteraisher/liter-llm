@@ -462,9 +462,6 @@ mod tests {
     use std::sync::Arc;
     use std::sync::atomic::{AtomicUsize, Ordering};
 
-    use tower::Layer as _;
-    use tower::Service as _;
-
     use super::*;
     use crate::observability::UsageSink;
     use crate::observability::usage::{UsageEvent, UsageSinkError};

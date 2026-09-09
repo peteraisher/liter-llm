@@ -100,7 +100,7 @@ import (
 	"log"
 	"os"
 
-	literllm "github.com/xberg-io/liter-llm/packages/go"
+	literllm "github.com/xberg-io/liter-llm/packages/go/v2"
 )
 
 func main() {

@@ -1,24 +1,61 @@
-//! Integration tests for [`liter_llm_proxy::secrets::AwsSecretsManagerProvider`].
-//!
-//! The original brief asks for a test that mocks AWS Secrets Manager and
-//! asserts that a `ResourceNotFoundException` SDK error is translated to
-//! [`SecretError::NotFound`].
-//!
-//! `aws-smithy-mocks-experimental` (and the `aws-sdk-secretsmanager` `test`
-//! feature) are not in `dev-dependencies` for this crate (see
-//! `crates/liter-llm-proxy/Cargo.toml`).  The test below is therefore gated
-//! behind `#[ignore]` so the test file compiles and is discoverable by
-//! `cargo test`, while making the missing harness explicit.
-
 #![cfg(feature = "secrets-aws")]
 
-/// `AwsSecretsManagerProvider::get` must translate
-/// `ResourceNotFoundException` into [`SecretError::NotFound`].
-///
-/// To enable:
-///   1. Add `aws-smithy-mocks-experimental` (or enable the `aws-sdk-secretsmanager`
-///      `test` feature) in `crates/liter-llm-proxy/Cargo.toml` dev-deps.
-///   2. Remove the `#[ignore]` attribute below.
+use std::time::Duration;
+
+use aws_sdk_secretsmanager::config::{BehaviorVersion, Credentials, Region};
+use liter_llm_proxy::secrets::{AwsSecretsManagerProvider, SecretError, SecretManager};
+use secrecy::ExposeSecret;
+use wiremock::matchers::{body_json, header, header_exists, method};
+use wiremock::{Mock, MockServer, ResponseTemplate};
+
 #[tokio::test]
-#[ignore = "aws-smithy-mocks-experimental not in dev-dependencies; enable once available"]
-async fn fetch_returns_error_on_resource_not_found() {}
+async fn default_connector_fetches_secret_and_preserves_not_found_error() {
+    tokio::time::timeout(Duration::from_secs(15), verify_aws_http_contract())
+        .await
+        .expect("AWS fixture must finish within its deadline");
+}
+
+async fn verify_aws_http_contract() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(header("x-amz-target", "secretsmanager.GetSecretValue"))
+        .and(header_exists("authorization"))
+        .and(body_json(serde_json::json!({"SecretId": "fixture/present"})))
+        .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+            "Name": "fixture/present", "SecretString": "retained-value", "VersionId": "version-one"
+        })))
+        .expect(1)
+        .mount(&server)
+        .await;
+    Mock::given(method("POST"))
+        .and(header("x-amz-target", "secretsmanager.GetSecretValue"))
+        .and(header_exists("authorization"))
+        .and(body_json(serde_json::json!({"SecretId": "fixture/missing"})))
+        .respond_with(ResponseTemplate::new(400).set_body_json(serde_json::json!({
+            "__type": "ResourceNotFoundException", "Message": "fixture is absent"
+        })))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let config = aws_sdk_secretsmanager::Config::builder()
+        .behavior_version(BehaviorVersion::latest())
+        .region(Region::new("us-east-1"))
+        .credentials_provider(Credentials::new(
+            "fixture-access",
+            "fixture-secret",
+            None,
+            None,
+            "fixture",
+        ))
+        .endpoint_url(server.uri())
+        .build();
+    let provider =
+        AwsSecretsManagerProvider::from_client(aws_sdk_secretsmanager::Client::from_conf(config), Duration::ZERO);
+    let secret = provider.get("fixture/present").await.expect("local AWS response");
+    assert_eq!(secret.value.expose_secret(), "retained-value");
+    assert_eq!(secret.metadata.version, "version-one");
+    let result = provider.get("fixture/missing").await;
+    assert!(matches!(result, Err(SecretError::NotFound(ref name)) if name == "fixture/missing"));
+    assert_eq!(server.received_requests().await.expect("recorded requests").len(), 2);
+    server.verify().await;
+}
