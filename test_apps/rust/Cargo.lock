@@ -1779,9 +1779,9 @@ checksum = "47d9d19d1d6efa0109d2f65ff4c85cddd50bd572e5a00127ab10987290bcefae"
 
 [[package]]
 name = "liter-llm"
-version = "1.19.2"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "883a4704bafd86f33c011940adac5e9962614a0f5917738a91cf22e528b1a805"
+checksum = "fc69f33b80b2a51efa2c2bd722c876bcbcb8626734a2bf4f29e3ef3c3f8d4a42"
 dependencies = [
  "ahash 0.8.12",
  "arc-swap",
@@ -1797,6 +1797,7 @@ dependencies = [
  "jsonwebtoken",
  "memchr",
  "opendal",
+ "opendal-http-transport-reqwest",
  "opentelemetry",
  "pin-project-lite",
  "rand 0.10.2",
@@ -1821,9 +1822,10 @@ dependencies = [
 
 [[package]]
 name = "liter_llm-e2e-rust"
-version = "1.19.2"
+version = "2.0.0"
 dependencies = [
  "axum",
+ "flate2",
  "liter-llm",
  "serde",
  "serde_json",
@@ -2045,9 +2047,9 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
 name = "opendal"
-version = "0.58.2"
+version = "0.59.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33dbff14cc9bb085224256d6a81289d2f3202e85b06f408d42534b42162a4231"
+checksum = "f950151f9587a51a7bed70a15fa0cff464eae96e41ae7499f97067bdafdf43eb"
 dependencies = [
  "opendal-core",
  "opendal-service-fs",
@@ -2057,9 +2059,9 @@ dependencies = [
 
 [[package]]
 name = "opendal-core"
-version = "0.58.2"
+version = "0.59.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48dbcef97d3eb7591db2c18d5cae95c836bcce07359b98d98dd6f4e861eb77b7"
+checksum = "a43405d217dfdfb543f58847336d3af672897dd1939bb7dcf314b63cf364f1c9"
 dependencies = [
  "anyhow",
  "asyncband",
@@ -2082,10 +2084,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "opendal-service-fs"
-version = "0.58.2"
+name = "opendal-http-transport-reqwest"
+version = "0.59.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7ef1e1c45f3f89282a59073897e0d685e51385fed0aea771714789525cff996"
+checksum = "401999057db611e592f883fcf2cbd6754ff37af587deaadd07b8c1398b2b6b06"
+dependencies = [
+ "bytes",
+ "futures",
+ "http 1.5.0",
+ "http-body 1.1.0",
+ "opendal-core",
+ "reqwest",
+]
+
+[[package]]
+name = "opendal-service-fs"
+version = "0.59.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb9caf04d6d38713299dd4abac984b95ab16ee20e1ff09160f495c5a64644083"
 dependencies = [
  "bytes",
  "log",
@@ -2097,9 +2113,9 @@ dependencies = [
 
 [[package]]
 name = "opendal-service-redis"
-version = "0.58.2"
+version = "0.59.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93c1e0ca03e59a9fdfd08a6924f376835899699d939a7fbb665d4d8901d4900d"
+checksum = "5cb715624e6f35cb2c7b0a2b36d1213e7ed9a4ee4b09e32ba294f73066ad0db0"
 dependencies = [
  "bytes",
  "fastpool",
@@ -2112,9 +2128,9 @@ dependencies = [
 
 [[package]]
 name = "opendal-service-s3"
-version = "0.58.2"
+version = "0.59.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c64335f9f24ccb62ac36f1d976342b48611a75ba61979813a4f78a4ebd94de42"
+checksum = "388b1d39b62535c62803754ebef89808859558697366dbedd0299345887ba461"
 dependencies = [
  "base64 0.23.1",
  "bytes",

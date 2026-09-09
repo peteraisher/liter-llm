@@ -55,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Install prose tools from the standalone documentation workspace and check MDX as well as Markdown with real failure controls.
 
-- Refresh Python and Rust consumer locks to the current release.
+- Refresh the Rust consumer lock to published liter-llm 2.0.0.
 
 - Remove endpoint URLs from transport-retry warnings so URL path and query credentials
   do not reach application logs; retain retry counts and the transport error category.
