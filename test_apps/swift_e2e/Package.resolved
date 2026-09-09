@@ -1,13 +1,13 @@
 {
-  "originHash" : "1ab04e76895dec3ae786830d951a52b32e0697d2864cf272e80f2a4767bbd62b",
+  "originHash" : "e0ed9feb77f71b90eae741e538f608af60a427ca6e1d03694f52278f05dc6379",
   "pins" : [
     {
       "identity" : "liter-llm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xberg-io/liter-llm.git",
+      "location" : "https://github.com/xberg-io/liter-llm",
       "state" : {
-        "revision" : "a5f95db561c8129020e0837031cc6f7126a1167a",
-        "version" : "1.8.1"
+        "branch" : "release/swift/2.0.0",
+        "revision" : "c2fd4cc7c7a58f382556815b820bd3a25e0a9cbb"
       }
     }
   ],
