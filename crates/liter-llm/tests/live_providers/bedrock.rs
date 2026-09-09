@@ -25,6 +25,27 @@ async fn chat_basic() {
 }
 
 #[tokio::test]
+async fn chat_basic_bearer_token() {
+    let _token = require_env!("AWS_BEARER_TOKEN_BEDROCK");
+    let client = bedrock_client();
+
+    let resp = client
+        .chat(simple_chat_request("bedrock/us.anthropic.claude-sonnet-4-6"))
+        .await
+        .unwrap();
+
+    assert!(!resp.choices.is_empty(), "bedrock: choices should not be empty");
+    assert!(
+        resp.choices[0].message.text().is_some_and(|c| !c.is_empty()),
+        "bedrock: first choice content should be non-empty"
+    );
+    assert!(
+        resp.choices[0].finish_reason.is_some(),
+        "bedrock: finish_reason should be present"
+    );
+}
+
+#[tokio::test]
 async fn chat_stream() {
     let _key = require_env!("AWS_ACCESS_KEY_ID");
     let client = bedrock_client();

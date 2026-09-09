@@ -290,15 +290,15 @@ const client = createClientFromJson(JSON.stringify({
 
 API keys passed to the constructor are wrapped in `secrecy::SecretString`. They are never logged, serialized, or included in error messages. If the constructor is given an empty `api_key`, the builder reads the standard environment variable for the active provider:
 
-| Provider        | Environment variable                          |
-| --------------- | --------------------------------------------- |
-| OpenAI          | `OPENAI_API_KEY`                              |
-| Anthropic       | `ANTHROPIC_API_KEY`                           |
-| Google (Gemini) | `GEMINI_API_KEY`                              |
-| Groq            | `GROQ_API_KEY`                                |
-| Mistral         | `MISTRAL_API_KEY`                             |
-| Cohere          | `CO_API_KEY`                                  |
-| AWS Bedrock     | `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` |
+| Provider        | Environment variable                                                         |
+| --------------- | ---------------------------------------------------------------------------- |
+| OpenAI          | `OPENAI_API_KEY`                                                             |
+| Anthropic       | `ANTHROPIC_API_KEY`                                                          |
+| Google (Gemini) | `GEMINI_API_KEY`                                                             |
+| Groq            | `GROQ_API_KEY`                                                               |
+| Mistral         | `MISTRAL_API_KEY`                                                            |
+| Cohere          | `CO_API_KEY`                                                                 |
+| AWS Bedrock     | `AWS_BEARER_TOKEN_BEDROCK`, or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` |
 
 ## Custom base URLs
 

@@ -1053,8 +1053,11 @@ mod provider_tests {
 
     #[test]
     #[cfg(not(feature = "bedrock"))]
-    fn bedrock_signing_headers_without_feature_returns_empty() {
+    fn bedrock_signing_headers_without_feature_or_credentials_returns_empty() {
         use crate::provider::bedrock::BedrockProvider;
+        // ~keep SAFETY: env vars are process-global. The bearer path is feature-independent,
+        // so an ambient AWS_BEARER_TOKEN_BEDROCK would rightly produce a header here.
+        unsafe { std::env::remove_var("AWS_BEARER_TOKEN_BEDROCK") };
         let p = BedrockProvider::new("us-east-1");
         let headers = p
             .signing_headers("POST", "http://localhost/chat/completions", b"{}")

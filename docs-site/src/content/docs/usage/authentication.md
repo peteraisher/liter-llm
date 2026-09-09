@@ -92,6 +92,12 @@ let azure_config = ClientConfigBuilder::new("placeholder")
 let azure_client = DefaultClient::new(azure_config, None)?;
 ```
 
+## AWS Bedrock (API key)
+
+A Bedrock API key (`ABSK...`, issued from the Bedrock console) is read from `AWS_BEARER_TOKEN_BEDROCK` and sent as `Authorization: Bearer <token>`. It needs no signing, so it works with the `bedrock` feature off, and no `CredentialProvider`: the variable is read per request, so a rotated key needs no new client.
+
+An access-key pair set explicitly on the client takes precedence; the token takes precedence over `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in the environment, matching the AWS SDKs.
+
 ## AWS Bedrock (STS web identity)
 
 `WebIdentityCredentialProvider` reads an OIDC JWT from a file, calls the STS `AssumeRoleWithWebIdentity` endpoint, and returns temporary AWS credentials for SigV4 signing. This is the standard flow for EKS pods using IAM Roles for Service Accounts (IRSA).
