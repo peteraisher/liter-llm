@@ -309,8 +309,6 @@ mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::task::{Context, Poll};
 
-    use tower::{Layer as _, Service as _};
-
     use super::*;
     use crate::error::LiterLlmError;
     use crate::tower::service::LlmService;

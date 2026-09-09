@@ -498,7 +498,6 @@ fn record_cost_window(state: &CostRateLimitState, model: &str, usage: Option<&Us
 
 #[cfg(test)]
 mod tests {
-    use tower::{Layer as _, Service as _};
 
     use super::*;
     use crate::tower::tests_common::{MockClient, chat_req};

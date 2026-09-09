@@ -303,7 +303,7 @@ mod tests {
     use std::sync::Arc;
     use std::time::Duration;
 
-    use tower::{Layer as _, Service as _, ServiceExt as _};
+    use tower::ServiceExt as _;
 
     use super::*;
     use crate::tower::cache::{CacheConfig, CacheLayer, InMemoryStore};

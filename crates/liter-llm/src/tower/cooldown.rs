@@ -126,7 +126,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use tower::{Layer as _, Service as _};
 
     use super::*;
     use crate::tower::service::LlmService;

@@ -750,7 +750,6 @@ mod inner {
         use std::task::{Context as StdContext, Poll as StdPoll};
 
         use futures_core::Stream;
-        use tower::{Layer as _, Service as _};
 
         use super::*;
         use crate::client::{BoxStream, LlmClient};
