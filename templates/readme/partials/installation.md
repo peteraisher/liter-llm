@@ -2,7 +2,21 @@
 
 {% if package_manager | length == 1 %}
 {% set pm = package_manager[0] %}
-{% if pm == "pip" %}
+{% if pm == "cargo" %}
+Add the crate to your project:
+
+```bash
+cargo add {{ package_name }}
+```
+
+Or add it to your `Cargo.toml`:
+
+```toml
+[dependencies]
+{{ package_name }} = "{{ version }}"
+```
+
+{% elif pm == "pip" %}
 Install via pip:
 
 ```bash

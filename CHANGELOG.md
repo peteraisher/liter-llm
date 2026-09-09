@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Render Cargo installation commands in the Rust package README.
+
 - Keep task lint coverage compatible with current Poly reports while rejecting formatter errors.
 - Update Ruby E2E Faraday and JSON dependencies to resolve three security advisories.
 - Synchronize Java and Kotlin test harnesses with the patched Jackson dependencies used by generated packages. Verify both Kotlin registry pins against the release version before native tests.
