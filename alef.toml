@@ -2215,8 +2215,8 @@ cli_formula = "liter-llm"
 
 [[crates.e2e.registry.packages.homebrew.cli_tests]]
 name = "version"
-command = "$CLI_FORMULA --version"
-expect_contains = "$VERSION"
+command = '$CLI_FORMULA --version | grep -Fxq "$CLI_FORMULA $VERSION" && printf "%s" "version-match"'
+expect_contains = "version-match"
 
 [[crates.e2e.registry.packages.homebrew.cli_tests]]
 name = "help"

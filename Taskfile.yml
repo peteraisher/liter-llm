@@ -150,6 +150,7 @@ tasks:
         scripts/ci/test_consumer_versions.py
         scripts/ci/test_go_release_assets.py
         scripts/ci/test_swift_task_environment.py
+        scripts/ci/test_homebrew_consumer_version.py
         scripts/ci/test_node_public_outputs.py
 
   test:all:
