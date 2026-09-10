@@ -1,11 +1,10 @@
 version: "3"
 
-env:
-  MACOSX_DEPLOYMENT_TARGET: "13.0"
-  IPHONEOS_DEPLOYMENT_TARGET: "16.0"
-
 tasks:
   build:
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "13.0"
+      IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     desc: Build Swift native libraries for the declared minimum Apple OS versions
     cmds:
       - cargo build --locked --release -p liter-llm-swift -p liter-llm-ffi
