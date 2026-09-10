@@ -6,6 +6,7 @@
     .dependencies = .{
         .liter_llm = .{
             .url = "https://github.com/xberg-io/liter-llm/releases/download/v2.0.0/liter-llm-zig-v2.0.0.tar.gz",
+            .hash = "liter_llm-2.0.0-Jfgk_AR7FjNQG4Xrznb1QGb5Ok1RHe9S-qBaV1eYM_f4",
         },
     },
     .paths = .{

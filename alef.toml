@@ -2207,7 +2207,7 @@ name = "liter_llm_ffi"
 name = "LiterLlm"
 
 [crates.e2e.registry.packages.zig]
-hash = "STALE_HASH_REGENERATE"
+hash = "liter_llm-2.0.0-Jfgk_AR7FjNQG4Xrznb1QGb5Ok1RHe9S-qBaV1eYM_f4"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "xberg-io/homebrew-tap"
