@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`AWS_BEARER_TOKEN_BEDROCK` authenticates the Bedrock provider.** A Bedrock API key
   (`ABSK...`) is sent as `Authorization: Bearer <token>` and needs no signing, so it works with
-  the `bedrock` feature off. Precedence is explicit config, then the token, then environment
-  SigV4 credentials.
+  the `bedrock` feature off. Precedence is any explicitly configured credential field, then the
+  token, then environment SigV4 credentials; with the feature off, the token alone.
 
 ## [2.0.3] - 2026-09-18
 

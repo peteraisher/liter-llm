@@ -1052,6 +1052,7 @@ mod provider_tests {
     }
 
     #[test]
+    #[serial_test::serial]
     #[cfg(not(feature = "bedrock"))]
     fn bedrock_signing_headers_without_feature_or_credentials_returns_empty() {
         use crate::provider::bedrock::BedrockProvider;

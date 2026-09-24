@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "bedrock")]
-use crate::error::LiterLlmError;
-use crate::error::Result;
+use crate::error::{LiterLlmError, Result};
 use crate::provider::{Provider, StreamFormat};
 use crate::types::ChatCompletionChunk;
 
@@ -139,8 +137,9 @@ fn percent_encode_model(model: &str) -> String {
 /// `bedrock` feature off), or a SigV4 access-key pair from explicit config (see
 /// [`BedrockProvider::with_credentials`]) or the environment
 /// (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`), which
-/// needs the feature. Precedence: explicit config, then the token, then
-/// environment credentials.
+/// needs the feature. Precedence: any explicitly configured credential field, then
+/// the token, then environment credentials. Without the feature, only the token
+/// can authenticate, so it is used whatever else is configured.
 ///
 /// # Region resolution
 ///
@@ -286,21 +285,33 @@ impl BedrockProvider {
     /// The Bedrock API key from `AWS_BEARER_TOKEN_BEDROCK`, when it applies.
     ///
     /// Resolved per request, so a rotated key needs no new client — the same reason
-    /// the SigV4 path resolves `AWS_ACCESS_KEY_ID` at signing time. A complete pair from
-    /// [`BedrockProvider::with_credentials`] wins: an in-code credential must not be
-    /// redirected by an ambient variable. Against *environment* credentials the token
-    /// wins, matching the AWS SDKs. ~keep
+    /// the SigV4 path resolves `AWS_ACCESS_KEY_ID` at signing time.
+    ///
+    /// With the `bedrock` feature, any credential field set through
+    /// [`BedrockProvider::with_credentials`] wins. Each field falls back to the
+    /// environment on its own, so an explicit access key with an ambient secret is a
+    /// working SigV4 configuration, and an ambient token must not redirect it to another
+    /// principal. Against *environment* credentials the token wins, matching the AWS
+    /// SDKs. Without the feature nothing can sign, so a usable token always wins. ~keep
     fn bearer_token(&self) -> Option<String> {
-        // ~keep Empty is not set: `LlmConfig` fills the absent half of a partial pair with
-        // `String::new()`, which would otherwise drop the token and sign with no secret.
-        let has_explicit_pair = self.access_key_id.as_deref().is_some_and(|key| !key.is_empty())
-            && self.secret_access_key.as_deref().is_some_and(|key| !key.is_empty());
-        if has_explicit_pair {
-            return None;
+        #[cfg(feature = "bedrock")]
+        {
+            if self.has_explicit_credential() {
+                return None;
+            }
         }
         std::env::var("AWS_BEARER_TOKEN_BEDROCK")
             .ok()
             .filter(|token| !token.is_empty())
+    }
+
+    /// Whether any credential field was set in code rather than left to the environment.
+    fn has_explicit_credential(&self) -> bool {
+        // ~keep Empty is not set: a blank value is no credential anyone configured, so it
+        // must not suppress the token.
+        [&self.access_key_id, &self.secret_access_key, &self.session_token]
+            .into_iter()
+            .any(|field| field.as_deref().is_some_and(|value| !value.is_empty()))
     }
 }
 
@@ -348,10 +359,22 @@ impl Provider for BedrockProvider {
     /// [`BedrockProvider::transform_request`], since credentials can become
     /// unavailable between the two.
     ///
-    /// When the `bedrock` feature is disabled (e.g. in tests with `base_url`
-    /// override), validation is skipped so callers can connect to a mock server
-    /// without real AWS credentials.
+    /// When the `bedrock` feature is disabled, a provider with no credentials at
+    /// all passes, so callers can connect to a mock server via a `base_url`
+    /// override. Explicit credentials without a token are rejected: nothing in
+    /// that build can sign them, so the request would go out unauthenticated.
     fn validate(&self) -> Result<()> {
+        #[cfg(not(feature = "bedrock"))]
+        {
+            if self.has_explicit_credential() && self.bearer_token().is_none() {
+                return Err(LiterLlmError::Authentication {
+                    message: "AWS Bedrock access keys need the `bedrock` feature to sign requests. \
+                              Enable it, or set a Bedrock API key in AWS_BEARER_TOKEN_BEDROCK."
+                        .into(),
+                    status: 401,
+                });
+            }
+        }
         #[cfg(feature = "bedrock")]
         {
             // ~keep A Bedrock API key authenticates on its own; the SigV4 pair is not required.
@@ -1315,11 +1338,18 @@ mod tests {
         // ~keep Explicit dummy credentials so `transform_request`'s per-request
         // `validate()` check (see #42) doesn't fail non-signing-focused tests
         // regardless of the ambient AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env state.
-        BedrockProvider::new("us-east-1").with_credentials(
-            Some("AKIATESTDUMMY".to_owned()),
-            Some("test-dummy-secret".to_owned()),
-            None,
-        )
+        // Without the feature, `validate()` rejects explicit credentials it cannot sign,
+        // and passes a provider with none.
+        let p = BedrockProvider::new("us-east-1");
+        if cfg!(feature = "bedrock") {
+            p.with_credentials(
+                Some("AKIATESTDUMMY".to_owned()),
+                Some("test-dummy-secret".to_owned()),
+                None,
+            )
+        } else {
+            p
+        }
     }
 
     #[test]
@@ -1468,31 +1498,89 @@ mod tests {
 
     #[test]
     #[serial]
-    fn bearer_token_yields_to_explicit_credentials() {
-        // ~keep SAFETY: env vars are process-global; `#[serial]` ensures no parallel mutation.
+    #[cfg(feature = "bedrock")]
+    fn bearer_token_yields_to_any_explicit_credential_field() {
+        // ~keep Each field falls back to the environment on its own, so one explicit field
+        // is a SigV4 configuration an ambient token must not redirect to another principal.
+        unsafe { std::env::set_var("AWS_BEARER_TOKEN_BEDROCK", "ABSKtest") };
+        let explicit = || Some("explicit".to_owned());
+        for (access_key_id, secret_access_key, session_token) in [
+            (explicit(), explicit(), None),
+            (explicit(), None, None),
+            (None, explicit(), None),
+            (None, None, explicit()),
+        ] {
+            let p = BedrockProvider::new("us-east-1").with_credentials(
+                access_key_id.clone(),
+                secret_access_key.clone(),
+                session_token.clone(),
+            );
+            assert!(
+                p.bearer_token().is_none(),
+                "an ambient token must not override {access_key_id:?}/{secret_access_key:?}/{session_token:?}"
+            );
+        }
+        unsafe { std::env::remove_var("AWS_BEARER_TOKEN_BEDROCK") };
+    }
+
+    #[test]
+    #[serial]
+    #[cfg(not(feature = "bedrock"))]
+    fn bearer_token_wins_over_explicit_credentials_that_cannot_sign() {
+        // ~keep Without the feature an explicit pair is ignored by `signing_headers`, so
+        // letting it suppress the token would send the request unauthenticated.
         unsafe { std::env::set_var("AWS_BEARER_TOKEN_BEDROCK", "ABSKtest") };
         let p = BedrockProvider::new("us-east-1").with_credentials(
             Some("AKIAEXPLICIT".to_owned()),
             Some("explicit-secret".to_owned()),
             None,
         );
-        assert!(
-            p.bearer_token().is_none(),
-            "an ambient env token must not override credentials set explicitly in config"
+        assert_eq!(p.bearer_token().as_deref(), Some("ABSKtest"));
+        let headers = p
+            .signing_headers(
+                "POST",
+                "https://bedrock-runtime.us-east-1.amazonaws.com/model/foo/converse",
+                b"{}",
+            )
+            .expect("a bearer token needs no signing and cannot fail");
+        assert_eq!(
+            headers,
+            vec![("authorization".to_owned(), "Bearer ABSKtest".to_owned())]
         );
         unsafe { std::env::remove_var("AWS_BEARER_TOKEN_BEDROCK") };
     }
 
     #[test]
     #[serial]
-    fn bearer_token_survives_a_half_empty_credential_pair() {
-        // ~keep `LlmConfig` turns a config that sets only `access_key_id` into
-        // `secret_access_key: Some("")`, which must not count as an explicit pair.
-        unsafe { std::env::set_var("AWS_BEARER_TOKEN_BEDROCK", "ABSKtest") };
+    #[cfg(not(feature = "bedrock"))]
+    fn validate_rejects_explicit_credentials_it_cannot_sign() {
+        // ~keep Without this, the request goes out with no Authorization header and the
+        // caller sees an opaque 403 from AWS.
+        unsafe { std::env::remove_var("AWS_BEARER_TOKEN_BEDROCK") };
         let p = BedrockProvider::new("us-east-1").with_credentials(
             Some("AKIAEXPLICIT".to_owned()),
-            Some(String::new()),
+            Some("explicit-secret".to_owned()),
             None,
+        );
+        let err = p
+            .validate()
+            .expect_err("explicit credentials cannot sign without the feature");
+        assert!(
+            matches!(err, LiterLlmError::Authentication { .. }),
+            "expected an authentication error, got: {err:?}"
+        );
+    }
+
+    #[test]
+    #[serial]
+    fn bearer_token_survives_blank_credential_fields() {
+        // ~keep A blank value is no credential anyone configured, so it must not suppress
+        // the token.
+        unsafe { std::env::set_var("AWS_BEARER_TOKEN_BEDROCK", "ABSKtest") };
+        let p = BedrockProvider::new("us-east-1").with_credentials(
+            Some(String::new()),
+            Some(String::new()),
+            Some(String::new()),
         );
         assert_eq!(p.bearer_token().as_deref(), Some("ABSKtest"));
         unsafe { std::env::remove_var("AWS_BEARER_TOKEN_BEDROCK") };
@@ -1567,6 +1655,7 @@ mod tests {
 
     #[test]
     #[serial]
+    #[cfg(feature = "bedrock")]
     fn validate_accepts_explicit_credentials_without_env() {
         // ~keep SAFETY: env vars are process-global; `#[serial]` ensures no parallel mutation.
         unsafe { std::env::remove_var("AWS_ACCESS_KEY_ID") };

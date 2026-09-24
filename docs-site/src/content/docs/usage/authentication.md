@@ -96,7 +96,7 @@ let azure_client = DefaultClient::new(azure_config, None)?;
 
 A Bedrock API key (`ABSK...`, issued from the Bedrock console) is read from `AWS_BEARER_TOKEN_BEDROCK` and sent as `Authorization: Bearer <token>`. It needs no signing, so it works with the `bedrock` feature off, and no `CredentialProvider`: the variable is read per request, so a rotated key needs no new client.
 
-An access-key pair set explicitly on the client takes precedence; the token takes precedence over `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in the environment, matching the AWS SDKs.
+With the `bedrock` feature, any access-key, secret or session-token field set explicitly on the client takes precedence, since each falls back to the environment independently; the token takes precedence over `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in the environment, matching the AWS SDKs. Without the feature an access-key pair cannot sign, so the token is used whatever else is set.
 
 ## AWS Bedrock (STS web identity)
 

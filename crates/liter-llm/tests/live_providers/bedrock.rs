@@ -1,12 +1,17 @@
+#[cfg(feature = "bedrock")]
 use futures_util::StreamExt;
 use liter_llm::LlmClient;
 
+#[cfg(feature = "bedrock")]
+use super::bedrock_sigv4_client;
 use super::{bedrock_client, require_env, simple_chat_request};
 
 #[tokio::test]
+#[cfg(feature = "bedrock")]
 async fn chat_basic() {
-    let _key = require_env!("AWS_ACCESS_KEY_ID");
-    let client = bedrock_client();
+    let access_key_id = require_env!("AWS_ACCESS_KEY_ID");
+    let secret_access_key = require_env!("AWS_SECRET_ACCESS_KEY");
+    let client = bedrock_sigv4_client(&access_key_id, &secret_access_key);
 
     let resp = client
         .chat(simple_chat_request("bedrock/us.anthropic.claude-sonnet-4-6"))
@@ -46,9 +51,11 @@ async fn chat_basic_bearer_token() {
 }
 
 #[tokio::test]
+#[cfg(feature = "bedrock")]
 async fn chat_stream() {
-    let _key = require_env!("AWS_ACCESS_KEY_ID");
-    let client = bedrock_client();
+    let access_key_id = require_env!("AWS_ACCESS_KEY_ID");
+    let secret_access_key = require_env!("AWS_SECRET_ACCESS_KEY");
+    let client = bedrock_sigv4_client(&access_key_id, &secret_access_key);
 
     let mut stream = client
         .chat_stream(simple_chat_request("bedrock/us.anthropic.claude-sonnet-4-6"))

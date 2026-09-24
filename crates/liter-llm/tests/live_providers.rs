@@ -26,7 +26,6 @@ use liter_llm::{ChatCompletionRequest, ClientConfigBuilder, DefaultClient, Embed
 mod anthropic;
 #[path = "live_providers/azure.rs"]
 mod azure;
-#[cfg(feature = "bedrock")]
 #[path = "live_providers/bedrock.rs"]
 mod bedrock;
 #[path = "live_providers/cross_provider.rs"]
@@ -69,9 +68,23 @@ pub fn google_ai_client(api_key: &str) -> DefaultClient {
     DefaultClient::new(config, Some("gemini/gemini-2.5-flash-lite")).unwrap()
 }
 
-#[cfg(feature = "bedrock")]
 pub fn bedrock_client() -> DefaultClient {
     let config = ClientConfigBuilder::new("").max_retries(2).build();
+    DefaultClient::new(config, Some("bedrock/us.anthropic.claude-sonnet-4-6")).unwrap()
+}
+
+/// A Bedrock client holding the access-key pair explicitly, so an exported
+/// `AWS_BEARER_TOKEN_BEDROCK` cannot turn a SigV4 test into a bearer test.
+#[cfg(feature = "bedrock")]
+pub fn bedrock_sigv4_client(access_key_id: &str, secret_access_key: &str) -> DefaultClient {
+    let config = ClientConfigBuilder::new("")
+        .bedrock_credentials(
+            access_key_id,
+            secret_access_key,
+            std::env::var("AWS_SESSION_TOKEN").ok().filter(|v| !v.is_empty()),
+        )
+        .max_retries(2)
+        .build();
     DefaultClient::new(config, Some("bedrock/us.anthropic.claude-sonnet-4-6")).unwrap()
 }
 
